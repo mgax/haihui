@@ -12,37 +12,4 @@
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-<script>
-'use strict';
-
-var width = 400;
-var height = 400;
-
-var svg = d3.select('body').append('svg')
-    .attr('width', width)
-    .attr('height', height);
-
-var projection = d3.geo.albers()
-    .center([0, 45.5])
-    .rotate([-26, 0])
-    .parallels([40, 50])
-    .scale(100000)
-    .translate([width / 2, height / 2]);
-
-var path = d3.geo.path()
-    .projection(projection);
-
-d3.json('data/ciucas.topojson', function(error, map) {
-  if (error) return console.error(error);
-
-  var segments = topojson.feature(map, map.objects.segments).features;
-
-  svg.append('g')
-    .selectAll('.way')
-      .data(segments)
-    .enter().append('path')
-      .attr('class', 'way')
-      .attr('d', path);
-});
-
-</script>
+<script src="build/ui.js"></script>
