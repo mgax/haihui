@@ -18,6 +18,12 @@ gulp.task('serve', function() {
 });
 
 
+gulp.task('data', function() {
+  require('coffee-script/register');
+  require('./src/data.coffee')();
+});
+
+
 gulp.task('ui', function() {
   gulp.src('./src/ui.coffee')
     .pipe(sourcemaps.init())
@@ -28,10 +34,11 @@ gulp.task('ui', function() {
 
 
 gulp.task('auto', function() {
+  gulp.start('data');
   gulp.start('ui');
-  gulp.watch('src/**/*', ['ui']);
+  gulp.watch('src/**/*', ['data', 'ui']);
 });
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['ui']);
+gulp.task('default', ['data', 'ui']);
