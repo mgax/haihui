@@ -15,7 +15,7 @@ projection = d3.geo.albers()
 path = d3.geo.path()
     .projection(projection)
 
-d3.json 'data/ciucas.topojson', (error, map) ->
+d3.json 'build/ciucas.topojson', (error, map) ->
   if error then return console.error(error)
 
   segments = topojson.feature(map, map.objects.segments).features

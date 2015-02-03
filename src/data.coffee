@@ -33,4 +33,4 @@ module.exports = ->
 
   map = topojson.topology(layers, quantization: 1000000)
 
-  fs.writeFileSync('data/ciucas.topojson', JSON.stringify(map))
+  fs.writeFileSync('build/ciucas.topojson', JSON.stringify(map))
