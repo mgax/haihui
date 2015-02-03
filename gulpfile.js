@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
     coffee = require('gulp-coffee'),
+    less = require('gulp-less'),
     sourcemaps = require('gulp-sourcemaps'),
     Q = require('q'),
     http = require('http'),
@@ -30,6 +31,10 @@ gulp.task('ui', function() {
     .pipe(coffee())
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
+
+  gulp.src('src/ui.less')
+    .pipe(less())
+    .pipe(gulp.dest('./build'))
 });
 
 
