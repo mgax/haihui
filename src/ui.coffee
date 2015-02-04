@@ -2,7 +2,7 @@ initialize = (map) ->
   segments = topojson.feature(map, map.objects.segments).features
 
   center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
-  s0 = 100000
+  s0 = 1
   sc = 1
   t0 = [0, 0]
   tr = [0, 0]
@@ -11,8 +11,12 @@ initialize = (map) ->
       .center([0, center[1]])
       .rotate([-center[0], 0])
       .parallels([center[1] - 5, center[1] + 5])
-      .scale(s0)
-      .translate(t0)
+      .scale(1)
+
+  _sw = projection(map.bbox.slice(0, 2))
+  _ne = projection(map.bbox.slice(2, 4))
+  boxWidth = _ne[0] - _sw[0]
+  boxHeight = _sw[1] - _ne[1]
 
   zoom = d3.behavior.zoom()
       .scaleExtent([1, 1000])
@@ -44,6 +48,8 @@ initialize = (map) ->
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
+
+    projection.scale(s0 = d3.min([width / boxWidth, height / boxHeight]))
 
     svg.select('.zoomrect')
         .attr('width', width)
