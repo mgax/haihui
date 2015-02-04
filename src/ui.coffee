@@ -1,5 +1,5 @@
 initialize = (map) ->
-  segments = topojson.feature(map, map.objects.segments).features
+  segments = topojson.feature(map.topo, map.topo.objects.segments).features
 
   center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
   s0 = 1
@@ -68,6 +68,6 @@ initialize = (map) ->
   resize()
 
 
-d3.json 'build/ciucas.topojson', (error, map) ->
+d3.json 'build/ciucas.json', (error, map) ->
   if error then return console.error(error)
   initialize(map)

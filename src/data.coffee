@@ -32,7 +32,9 @@ module.exports = ->
     segments: layer(segment(id) for id in wayIds)
   }
 
-  map = topojson.topology(layers, quantization: 1000000)
-  map.bbox = bboxCiucas
+  map = {
+    topo: topojson.topology(layers, quantization: 1000000)
+    bbox: bboxCiucas
+  }
 
-  fs.writeFileSync('build/ciucas.topojson', JSON.stringify(map))
+  fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
