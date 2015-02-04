@@ -27,10 +27,16 @@ module.exports = ->
 
   layer = (features) -> {type: 'FeatureCollection', features: features}
 
-  route = (relation) -> {
-    segments: m.ref for m in relation.members
-    symbol: relation.tags['osmc:symbol']
-  }
+  route = (relation) ->
+    segments = []
+    for m in relation.members
+      if obj[m.ref].type == 'way'
+        segments.push(m.ref)
+
+    return {
+      segments: segments
+      symbol: relation.tags['osmc:symbol']
+    }
 
   layers = {
     segments: layer(segment(id) for id in wayIds)
