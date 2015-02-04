@@ -26,7 +26,7 @@ gulp.task('data', function() {
 
 
 gulp.task('ui', function() {
-  gulp.src('./src/ui.coffee')
+  gulp.src(['./src/symbol.coffee', './src/ui.coffee'])
     .pipe(sourcemaps.init())
     .pipe(coffee())
     .pipe(sourcemaps.write('./'))
