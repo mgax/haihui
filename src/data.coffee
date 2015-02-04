@@ -3,6 +3,7 @@ topojson = require('topojson')
 
 
 module.exports = ->
+  bboxCiucas = [25.8449, 45.4371, 26.0518, 45.5619]
   obj = {}
   routeIds = []
   wayIds = []
@@ -32,5 +33,6 @@ module.exports = ->
   }
 
   map = topojson.topology(layers, quantization: 1000000)
+  map.bbox = bboxCiucas
 
   fs.writeFileSync('build/ciucas.topojson', JSON.stringify(map))
