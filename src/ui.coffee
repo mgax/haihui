@@ -1,5 +1,19 @@
+index = (objects) ->
+  map = d3.map()
+  for o in objects
+    map.set(o.id, o)
+  return map
+
+
 initialize = (map) ->
   segments = topojson.feature(map.topo, map.topo.objects.segments).features
+  segmentMap = index(segments)
+
+  for route in map.routes
+    for id in route.segments
+      segment = segmentMap.get(id)
+      segment.properties.symbols = [] unless segment.properties.symbols?
+      segment.properties.symbols.push(route.symbol)
 
   center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
   s0 = 1
@@ -45,6 +59,30 @@ initialize = (map) ->
     geo.selectAll('.way')
         .attr('d', path)
 
+  renderSymbols = ->
+    geo.selectAll('.symbol-osmc').remove()
+    interval = 2 / sc
+    symbols = []
+    for segment in segments
+      for n in d3.range(0, d3.round(turf.lineDistance(segment, 'kilometers') / interval))
+        point = turf.along(segment, n * interval + 0.5, 'kilometers')
+        symbols.push(
+          point: point.geometry.coordinates
+          symbol: segment.properties.symbols[0]
+        )
+
+    geo.selectAll('.symbol-osmc').data(symbols)
+      .enter().append('g')
+        .each (d) ->
+          app.symbol.osmc(d.symbol)(d3.select(@))
+
+    updateSymbols()
+
+  updateSymbols = ->
+    geo.selectAll('.symbol-osmc')
+        .attr 'transform', (d) ->
+          "translate(#{d3.round(d) for d in projection(d.point)})"
+
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
@@ -63,9 +101,13 @@ initialize = (map) ->
     tr = d3.event.translate
     sc = d3.event.scale
     render()
+    updateSymbols()
 
   d3.select(window).on('resize', resize)
   resize()
+
+  zoom.on('zoomend', renderSymbols)
+  renderSymbols()
 
 
 d3.json 'build/ciucas.json', (error, map) ->
