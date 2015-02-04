@@ -1,15 +1,16 @@
 initialize = (map) ->
   segments = topojson.feature(map, map.objects.segments).features
 
+  center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
   s0 = 100000
   sc = 1
-  t0 = [0, 9]
+  t0 = [0, 0]
   tr = [0, 0]
 
   projection = d3.geo.albers()
-      .center([0, 45.5])
-      .rotate([-26, 0])
-      .parallels([40, 50])
+      .center([0, center[1]])
+      .rotate([-center[0], 0])
+      .parallels([center[1] - 5, center[1] + 5])
       .scale(s0)
       .translate(t0)
 
