@@ -63,7 +63,7 @@ initialize = (map) ->
 
   renderSymbols = ->
     geo.selectAll('.symbol-osmc').remove()
-    interval = 2 / sc
+    interval = 500000 / (s0 * sc)
     symbols = []
     for segment in segments
       for n in d3.range(0, d3.round(turf.lineDistance(segment, 'kilometers') / interval))
@@ -100,6 +100,7 @@ initialize = (map) ->
     projection.translate(t0 = [width / 2, height / 2])
 
     render()
+    renderSymbols()
 
   zoom.on 'zoom', ->
     tr = d3.event.translate
