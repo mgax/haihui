@@ -15,6 +15,8 @@ initialize = (map) ->
       segment.properties.symbols = [] unless segment.properties.symbols?
       segment.properties.symbols.push(route.symbol)
 
+  width = 1
+  height = 1
   center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
   s0 = 1
   sc = 1
@@ -66,10 +68,12 @@ initialize = (map) ->
     for segment in segments
       for n in d3.range(0, d3.round(turf.lineDistance(segment, 'kilometers') / interval))
         point = turf.along(segment, n * interval + 0.5, 'kilometers')
-        symbols.push(
-          point: point.geometry.coordinates
-          symbol: segment.properties.symbols[0]
-        )
+        [x, y] = projection(point.geometry.coordinates)
+        if x > 0 and x < width and y > 0 and y < height
+          symbols.push(
+            point: point.geometry.coordinates
+            symbol: segment.properties.symbols[0]
+          )
 
     geo.selectAll('.symbol-osmc').data(symbols)
       .enter().append('g')
