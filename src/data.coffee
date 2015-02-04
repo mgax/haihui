@@ -5,12 +5,12 @@ topojson = require('topojson')
 module.exports = ->
   bboxCiucas = [25.8449, 45.4371, 26.0518, 45.5619]
   obj = {}
-  routeIds = []
+  relationIds = []
   wayIds = []
   for o in JSON.parse(fs.readFileSync('data/ciucas.json')).elements
     obj[o.id] = o
     if o.type == 'relation'
-      routeIds.push o.id
+      relationIds.push o.id
     if o.type == 'way'
       wayIds.push o.id
 
@@ -19,14 +19,18 @@ module.exports = ->
 
   segment = (id) -> way = obj[id]; return {
     type: 'Feature'
-    properties:
-      id: id
+    id: id
     geometry:
       type: 'LineString'
       coordinates: pos(n) for n in way.nodes
   }
 
   layer = (features) -> {type: 'FeatureCollection', features: features}
+
+  route = (relation) -> {
+    segments: m.ref for m in relation.members
+    symbol: relation.tags['osmc:symbol']
+  }
 
   layers = {
     segments: layer(segment(id) for id in wayIds)
@@ -35,6 +39,7 @@ module.exports = ->
   map = {
     topo: topojson.topology(layers, quantization: 1000000)
     bbox: bboxCiucas
+    routes: route(obj[id]) for id in relationIds
   }
 
   fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
