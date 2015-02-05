@@ -39,9 +39,8 @@ gulp.task('ui', function() {
 
 
 gulp.task('auto', function() {
-  gulp.start('data');
   gulp.start('ui');
-  gulp.watch('src/**/*', ['data', 'ui']);
+  gulp.watch('src/**/*', ['ui']);
 });
 
 
