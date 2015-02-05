@@ -72,44 +72,39 @@ initialize = (map) ->
       length = turf.lineDistance(segment, 'kilometers')
       for n in d3.range(0, d3.round(length / interval))
         point = turf.along(segment, interval * (n + 0.5), 'kilometers')
+        point.properties = {symbols: segment.properties.symbols}
         [x, y] = projection(point.geometry.coordinates)
         if x > 0 and x < width and y > 0 and y < height
-          segmentSymbols.push(
-            point: point.geometry.coordinates
-            symbols: segment.properties.symbols
-          )
+          segmentSymbols.push(point)
 
     geo.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')
         .attr('class', 'symbol segmentSymbol')
         .each (d) ->
-          for i in d3.range(0, d.symbols.length)
-            dx = - d3.round(13 / 2 * (d.symbols.length - 1))
+          for i in d3.range(0, d.properties.symbols.length)
+            dx = - d3.round(13 / 2 * (d.properties.symbols.length - 1))
             g = d3.select(@).append('g')
                 .attr('transform', "translate(#{i * 13 + dx},0)")
-            app.symbol.osmc(d.symbols[i])(g)
+            app.symbol.osmc(d.properties.symbols[i])(g)
 
     poiSymbols = []
     for poi in poiLayer
       [x, y] = projection(poi.geometry.coordinates)
       if x > 0 and x < width and y > 0 and y < height
-        poiSymbols.push(
-          point: poi.geometry.coordinates
-          type: poi.properties.type
-        )
+        poiSymbols.push(poi)
 
     geo.selectAll('.poiSymbol').data(poiSymbols)
       .enter().append('g')
         .attr('class', 'symbol poiSymbol')
-        .each (d) ->
-          app.symbol[d.type](d3.select(@))
+        .each (poi) ->
+          app.symbol[poi.properties.type](d3.select(@))
 
     updateSymbols()
 
   updateSymbols = ->
     geo.selectAll('.symbol')
         .attr 'transform', (d) ->
-          "translate(#{d3.round(d) for d in projection(d.point)})"
+          "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
 
   resize = ->
     width = parseInt(d3.select('body').style('width'))
