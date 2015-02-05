@@ -16,8 +16,8 @@ app.symbol.osmc = (src) ->
 
     selection.append('rect')
         .attr('class', "background color-#{sym.background}")
-        .attr('x', - size/2 - 1)
-        .attr('y', - size/2 - 1)
+        .attr('x', - size/2 - .5)
+        .attr('y', - size/2 - .5)
         .attr('width', size + 1)
         .attr('height', size + 1)
 
