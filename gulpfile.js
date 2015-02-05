@@ -21,7 +21,7 @@ gulp.task('serve', function() {
 
 gulp.task('data', function() {
   require('coffee-script/register');
-  require('./src/data.coffee')();
+  return require('./src/data.coffee')();
 });
 
 

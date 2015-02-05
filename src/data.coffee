@@ -2,6 +2,7 @@ d3 = require('d3')
 fs = require('fs')
 request = require('request')
 topojson = require('topojson')
+Q = require('q')
 
 
 query = (bbox) ->
@@ -15,12 +16,16 @@ query = (bbox) ->
 
 
 module.exports = ->
+  deferred = Q.defer()
   bboxCiucas = [25.845, 45.437, 26.043, 45.562]
   q = query(bboxCiucas)
   url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
   request url, (err, res, body) ->
     map = compile(bboxCiucas, JSON.parse(body))
     fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
+    deferred.resolve()
+
+  return deferred.promise
 
 
 compile = (bbox, osm) ->
