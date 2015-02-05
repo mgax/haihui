@@ -56,6 +56,12 @@ app.symbol.osmc = (src) ->
             .attr('d', "M#{[0,-r]} L#{[-r,r]} L#{[r,r]} M#{[0,-r]}")
 
 
+app.symbol.chalet = (selection) ->
+  selection.append('path')
+      .attr('class', 'symbol-chalet')
+      .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
+
+
 app.symbol.peak = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-peak')
