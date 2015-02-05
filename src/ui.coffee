@@ -109,11 +109,9 @@ initialize = (map) ->
     render()
     updateSymbols()
 
+  zoom.on('zoomend', renderSymbols)
   d3.select(window).on('resize', resize)
   resize()
-
-  zoom.on('zoomend', renderSymbols)
-  renderSymbols()
 
 
 d3.json 'build/ciucas.json', (error, map) ->
