@@ -62,7 +62,7 @@ initialize = (map) ->
         .attr('d', path)
 
   renderSymbols = ->
-    geo.selectAll('.symbol-osmc').remove()
+    geo.selectAll('.segmentSymbol').remove()
     interval = 500000 / (s0 * sc)
     symbols = []
     for segment in segments
@@ -73,18 +73,23 @@ initialize = (map) ->
         if x > 0 and x < width and y > 0 and y < height
           symbols.push(
             point: point.geometry.coordinates
-            symbol: segment.properties.symbols[0]
+            symbols: segment.properties.symbols
           )
 
-    geo.selectAll('.symbol-osmc').data(symbols)
+    geo.selectAll('.segmentSymbol').data(symbols)
       .enter().append('g')
+        .attr('class', 'segmentSymbol')
         .each (d) ->
-          app.symbol.osmc(d.symbol)(d3.select(@))
+          for i in d3.range(0, d.symbols.length)
+            dx = - d3.round(13 / 2 * (d.symbols.length - 1))
+            g = d3.select(@).append('g')
+                .attr('transform', "translate(#{i * 13 + dx},0)")
+            app.symbol.osmc(d.symbols[i])(g)
 
     updateSymbols()
 
   updateSymbols = ->
-    geo.selectAll('.symbol-osmc')
+    geo.selectAll('.segmentSymbol')
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.point)})"
 
