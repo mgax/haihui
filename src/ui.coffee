@@ -44,13 +44,14 @@ initialize = (map) ->
 
   svg = d3.select('body').append('svg')
 
-  geo = svg.append('g')
+  ways = svg.append('g')
+  symbols = svg.append('g')
 
   svg.append('rect')
       .attr('class', 'zoomrect')
       .call(zoom)
 
-  geo.selectAll('.way')
+  ways.selectAll('.way')
       .data(segmentLayer)
     .enter().append('path')
       .attr('class', 'way')
@@ -60,11 +61,11 @@ initialize = (map) ->
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
 
-    geo.selectAll('.way')
+    ways.selectAll('.way')
         .attr('d', path)
 
   renderSymbols = ->
-    geo.selectAll('.symbol').remove()
+    symbols.selectAll('.symbol').remove()
 
     interval = 500000 / (s0 * sc)
     segmentSymbols = []
@@ -77,7 +78,7 @@ initialize = (map) ->
         if x > 0 and x < width and y > 0 and y < height
           segmentSymbols.push(point)
 
-    geo.selectAll('.segmentSymbol').data(segmentSymbols)
+    symbols.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')
         .attr('class', 'symbol segmentSymbol')
         .each (d) ->
@@ -93,7 +94,7 @@ initialize = (map) ->
       if x > 0 and x < width and y > 0 and y < height
         poiSymbols.push(poi)
 
-    geo.selectAll('.poiSymbol').data(poiSymbols)
+    symbols.selectAll('.poiSymbol').data(poiSymbols)
       .enter().append('g')
         .attr('class', 'symbol poiSymbol')
         .each (poi) ->
@@ -102,7 +103,7 @@ initialize = (map) ->
     updateSymbols()
 
   updateSymbols = ->
-    geo.selectAll('.symbol')
+    symbols.selectAll('.symbol')
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
 
