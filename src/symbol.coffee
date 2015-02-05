@@ -54,3 +54,15 @@ app.symbol.osmc = (src) ->
         selection.append('path')
             .attr('class', "graphic color-#{sym.color}")
             .attr('d', "M#{[0,-r]} L#{[-r,r]} L#{[r,r]} M#{[0,-r]}")
+
+
+app.symbol.peak = (selection) ->
+  selection.append('path')
+      .attr('class', 'symbol-peak')
+      .attr('d', "M0,-5 L5,3 L-5,3 L0,-5")
+
+
+app.symbol.saddle = (selection) ->
+  selection.append('path')
+      .attr('class', 'symbol-saddle')
+      .attr('d', "M0,2 L6,-2 L6,6 L-6,6 L-6,-2 L0,2")

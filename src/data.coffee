@@ -66,7 +66,7 @@ compile = (bbox, osm) ->
     id: id
     properties:
       name: node.tags.name
-      natural: node.tags.natural
+      type: node.tags.natural
     geometry:
       type: 'Point'
       coordinates: [node.lon, node.lat]

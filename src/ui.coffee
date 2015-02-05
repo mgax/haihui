@@ -6,8 +6,10 @@ index = (objects) ->
 
 
 initialize = (map) ->
-  segments = topojson.feature(map.topo, map.topo.objects.segments).features
-  segmentMap = index(segments)
+  segmentLayer = topojson.feature(map.topo, map.topo.objects.segments).features
+  segmentMap = index(segmentLayer)
+
+  poiLayer = topojson.feature(map.topo, map.topo.objects.poi).features
 
   for route in map.routes
     for id in route.segments
@@ -49,7 +51,7 @@ initialize = (map) ->
       .call(zoom)
 
   geo.selectAll('.way')
-      .data(segments)
+      .data(segmentLayer)
     .enter().append('path')
       .attr('class', 'way')
 
@@ -62,23 +64,24 @@ initialize = (map) ->
         .attr('d', path)
 
   renderSymbols = ->
-    geo.selectAll('.segmentSymbol').remove()
+    geo.selectAll('.symbol').remove()
+
     interval = 500000 / (s0 * sc)
-    symbols = []
-    for segment in segments
+    segmentSymbols = []
+    for segment in segmentLayer
       length = turf.lineDistance(segment, 'kilometers')
       for n in d3.range(0, d3.round(length / interval))
         point = turf.along(segment, interval * (n + 0.5), 'kilometers')
         [x, y] = projection(point.geometry.coordinates)
         if x > 0 and x < width and y > 0 and y < height
-          symbols.push(
+          segmentSymbols.push(
             point: point.geometry.coordinates
             symbols: segment.properties.symbols
           )
 
-    geo.selectAll('.segmentSymbol').data(symbols)
+    geo.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')
-        .attr('class', 'segmentSymbol')
+        .attr('class', 'symbol segmentSymbol')
         .each (d) ->
           for i in d3.range(0, d.symbols.length)
             dx = - d3.round(13 / 2 * (d.symbols.length - 1))
@@ -86,10 +89,25 @@ initialize = (map) ->
                 .attr('transform', "translate(#{i * 13 + dx},0)")
             app.symbol.osmc(d.symbols[i])(g)
 
+    poiSymbols = []
+    for poi in poiLayer
+      [x, y] = projection(poi.geometry.coordinates)
+      if x > 0 and x < width and y > 0 and y < height
+        poiSymbols.push(
+          point: poi.geometry.coordinates
+          type: poi.properties.type
+        )
+
+    geo.selectAll('.poiSymbol').data(poiSymbols)
+      .enter().append('g')
+        .attr('class', 'symbol poiSymbol')
+        .each (d) ->
+          app.symbol[d.type](d3.select(@))
+
     updateSymbols()
 
   updateSymbols = ->
-    geo.selectAll('.segmentSymbol')
+    geo.selectAll('.symbol')
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.point)})"
 
