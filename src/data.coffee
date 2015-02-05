@@ -2,6 +2,7 @@ d3 = require('d3')
 fs = require('fs')
 request = require('request')
 topojson = require('topojson')
+turf = require('turf')
 Q = require('q')
 
 
@@ -53,26 +54,20 @@ compile = (bbox, osm) ->
 
   pos = (id) -> node = obj[id]; return [node.lon, node.lat]
 
-  segment = (id) -> way = obj[id]; return {
-    type: 'Feature'
-    id: id
-    geometry:
-      type: 'LineString'
-      coordinates: pos(n) for n in way.nodes
-  }
+  segment = (id) ->
+    f = turf.linestring(pos(n) for n in obj[id].nodes)
+    f.id = id
+    return f
 
-  natural = (id) -> node = obj[id]; return {
-    type: 'Feature'
-    id: id
-    properties:
+  natural = (id) ->
+    node = obj[id]
+    f = turf.point([node.lon, node.lat])
+    f.id = id
+    f.properties = {
       name: node.tags.name
       type: node.tags.natural
-    geometry:
-      type: 'Point'
-      coordinates: [node.lon, node.lat]
-  }
-
-  layer = (features) -> {type: 'FeatureCollection', features: features}
+    }
+    return f
 
   route = (relation) ->
     segments = []
@@ -86,8 +81,8 @@ compile = (bbox, osm) ->
     }
 
   layers = {
-    segments: layer(segment(id) for id in segmentIds.values())
-    poi: layer(natural(id) for id in naturalIds.values())
+    segments: turf.featurecollection(segment(id) for id in segmentIds.values())
+    poi: turf.featurecollection(natural(id) for id in naturalIds.values())
   }
 
   return {
