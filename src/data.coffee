@@ -13,6 +13,8 @@ query = (bbox) ->
     {t: 'node',     k: 'natural', v: 'peak'}
     {t: 'node',     k: 'tourism', v: 'chalet'}
     {t: 'way',      k: 'tourism', v: 'chalet'}
+    {t: 'node',     k: 'tourism', v: 'alpine_hut'}
+    {t: 'way',      k: 'tourism', v: 'alpine_hut'}
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f.t}[\"#{f.k}\"=\"#{f.v}\"](#{overpassBbox});"
@@ -85,16 +87,18 @@ compile = (bbox, osm) ->
     obj[o.id] = o
 
   for o in osm.elements
+    continue unless o.tags?
+
     if o.type == 'relation' and o.tags.route == 'hiking'
       routeIds.add(o.id)
       for m in o.members
         if m.type == 'way'
           segmentIds.add(m.ref)
 
-    if o.type == 'node' and o.tags? and o.tags.natural?
+    if o.type == 'node' and o.tags.natural?
       poi.push(natural(o))
 
-    if o.tags? and o.tags.tourism == 'chalet'
+    if o.tags.tourism == 'chalet' or o.tags.tourism == 'alpine_hut'
       if o.type == 'node' or o.type == 'way'
         poi.push(tourism(o))
 
