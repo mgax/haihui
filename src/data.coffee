@@ -8,6 +8,10 @@ Q = require('q')
 query = (bbox) ->
   filters = [
     {t: 'relation', k: 'route',   v: 'hiking'}
+    {t: 'node',     k: 'natural', v: 'saddle'}
+    {t: 'node',     k: 'natural', v: 'peak'}
+    {t: 'node',     k: 'tourism', v: 'chalet'}
+    {t: 'way',      k: 'tourism', v: 'chalet'}
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f.t}[\"#{f.k}\"=\"#{f.v}\"](#{overpassBbox});"
@@ -32,6 +36,8 @@ compile = (bbox, osm) ->
   obj = {}
   routeIds = d3.set()
   segmentIds = d3.set()
+  naturalIds = d3.set()
+
   for o in osm.elements
     obj[o.id] = o
 
@@ -40,6 +46,9 @@ compile = (bbox, osm) ->
       for m in o.members
         if m.type == 'way'
           segmentIds.add(m.ref)
+
+    if o.type == 'node' and o.tags? and o.tags.natural?
+      naturalIds.add(o.id)
 
 
   pos = (id) -> node = obj[id]; return [node.lon, node.lat]
@@ -50,6 +59,17 @@ compile = (bbox, osm) ->
     geometry:
       type: 'LineString'
       coordinates: pos(n) for n in way.nodes
+  }
+
+  natural = (id) -> node = obj[id]; return {
+    type: 'Feature'
+    id: id
+    properties:
+      name: node.tags.name
+      natural: node.tags.natural
+    geometry:
+      type: 'Point'
+      coordinates: [node.lon, node.lat]
   }
 
   layer = (features) -> {type: 'FeatureCollection', features: features}
@@ -67,10 +87,14 @@ compile = (bbox, osm) ->
 
   layers = {
     segments: layer(segment(id) for id in segmentIds.values())
+    poi: layer(natural(id) for id in naturalIds.values())
   }
 
   return {
-    topo: topojson.topology(layers, quantization: 1000000)
+    topo: topojson.topology(layers, {
+      quantization: 1000000
+      'property-transform': (f) -> f.properties
+    })
     bbox: bbox
     routes: route(obj[id]) for id in routeIds.values()
   }
