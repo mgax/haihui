@@ -1,13 +1,32 @@
 fs = require('fs')
+request = require('request')
 topojson = require('topojson')
 
 
+query = (bbox) ->
+  filters = [
+    {t: 'relation', k: 'route',   v: 'hiking'}
+  ]
+  overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
+  item = (f) -> "#{f.t}[\"#{f.k}\"=\"#{f.v}\"](#{overpassBbox});"
+  items = (item(f) for f in filters).join('')
+  return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
+
+
 module.exports = ->
-  bboxCiucas = [25.8449, 45.4371, 26.0518, 45.5619]
+  bboxCiucas = [25.845, 45.437, 26.043, 45.562]
+  q = query(bboxCiucas)
+  url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
+  request url, (err, res, body) ->
+    map = compile(bboxCiucas, JSON.parse(body))
+    fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
+
+
+compile = (bbox, osm) ->
   obj = {}
   relationIds = []
   wayIds = []
-  for o in JSON.parse(fs.readFileSync('data/ciucas.json')).elements
+  for o in osm.elements
     obj[o.id] = o
     if o.type == 'relation'
       relationIds.push o.id
@@ -42,10 +61,8 @@ module.exports = ->
     segments: layer(segment(id) for id in wayIds)
   }
 
-  map = {
+  return {
     topo: topojson.topology(layers, quantization: 1000000)
-    bbox: bboxCiucas
+    bbox: bbox
     routes: route(obj[id]) for id in relationIds
   }
-
-  fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
