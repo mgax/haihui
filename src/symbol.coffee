@@ -61,14 +61,27 @@ app.symbol.chalet = (selection) ->
       .attr('class', 'symbol-chalet')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
+  selection.append('text')
+      .text(selection.datum().properties.name)
+      .attr('x', 10)
+      .attr('y', -2)
+
 
 app.symbol.peak = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-peak')
       .attr('d', "M0,-5 L5,3 L-5,3 L0,-5")
 
+  selection.append('text')
+      .text(selection.datum().properties.name)
+      .attr('x', 6)
+
 
 app.symbol.saddle = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-saddle')
       .attr('d', "M0,2 L6,-2 L6,6 L-6,6 L-6,-2 L0,2")
+
+  selection.append('text')
+      .text(selection.datum().properties.name)
+      .attr('x', 6)
