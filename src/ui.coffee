@@ -44,24 +44,24 @@ initialize = (map) ->
 
   svg = d3.select('body').append('svg')
 
-  ways = svg.append('g')
+  segments = svg.append('g')
   symbols = svg.append('g')
 
   svg.append('rect')
       .attr('class', 'zoomrect')
       .call(zoom)
 
-  ways.selectAll('.way')
+  segments.selectAll('.segment')
       .data(segmentLayer)
     .enter().append('path')
-      .attr('class', 'way')
+      .attr('class', 'segment')
 
   render = ->
     projection
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
 
-    ways.selectAll('.way')
+    segments.selectAll('.segment')
         .attr('d', path)
 
   renderSymbols = ->
