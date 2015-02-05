@@ -1,3 +1,4 @@
+d3 = require('d3')
 fs = require('fs')
 request = require('request')
 topojson = require('topojson')
@@ -24,14 +25,16 @@ module.exports = ->
 
 compile = (bbox, osm) ->
   obj = {}
-  relationIds = []
-  wayIds = []
+  routeIds = d3.set()
+  segmentIds = d3.set()
   for o in osm.elements
     obj[o.id] = o
-    if o.type == 'relation'
-      relationIds.push o.id
-    if o.type == 'way'
-      wayIds.push o.id
+
+    if o.type == 'relation' and o.tags.route == 'hiking'
+      routeIds.add(o.id)
+      for m in o.members
+        if m.type == 'way'
+          segmentIds.add(m.ref)
 
 
   pos = (id) -> node = obj[id]; return [node.lon, node.lat]
@@ -58,11 +61,11 @@ compile = (bbox, osm) ->
     }
 
   layers = {
-    segments: layer(segment(id) for id in wayIds)
+    segments: layer(segment(id) for id in segmentIds.values())
   }
 
   return {
     topo: topojson.topology(layers, quantization: 1000000)
     bbox: bbox
-    routes: route(obj[id]) for id in relationIds
+    routes: route(obj[id]) for id in routeIds.values()
   }
