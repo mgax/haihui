@@ -66,7 +66,8 @@ initialize = (map) ->
     interval = 500000 / (s0 * sc)
     symbols = []
     for segment in segments
-      for n in d3.range(0, d3.round(turf.lineDistance(segment, 'kilometers') / interval))
+      length = turf.lineDistance(segment, 'kilometers')
+      for n in d3.range(0, d3.round(length / interval))
         point = turf.along(segment, n * interval + 0.5, 'kilometers')
         [x, y] = projection(point.geometry.coordinates)
         if x > 0 and x < width and y > 0 and y < height
