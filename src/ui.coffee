@@ -46,6 +46,7 @@ initialize = (db) ->
   svg = d3.select('body').append('svg')
 
   segments = svg.append('g')
+  contours = svg.append('g')
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
 
@@ -65,12 +66,20 @@ initialize = (db) ->
     .enter().append('path')
       .attr('class', 'segment')
 
+  contours.selectAll('.contour')
+      .data(topojson.feature(db.contours, db.contours.objects.contour).features)
+    .enter().append('path')
+      .attr('class', 'contour')
+
   render = ->
     projection
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
 
     segments.selectAll('.segment')
+        .attr('d', path)
+
+    contours.selectAll('.contour')
         .attr('d', path)
 
   renderSymbols = ->
@@ -177,4 +186,7 @@ initialize = (db) ->
 
 d3.json 'build/ciucas.json', (error, db) ->
   if error then return console.error(error)
-  initialize(db)
+  d3.json 'build/ciucas-contour.topojson', (error, contours) ->
+    if error then return console.error(error)
+    db.contours = contours
+    initialize(db)
