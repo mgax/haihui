@@ -1,9 +1,17 @@
+child_process = require('child_process')
 d3 = require('d3')
 fs = require('fs')
 request = require('request')
 topojson = require('topojson')
 turf = require('turf')
 Q = require('q')
+
+
+exec = (cmd) ->
+  done = Q.defer()
+  console.log cmd
+  child_process.exec cmd, done.resolve
+  return done.promise
 
 
 query = (bbox) ->
@@ -22,7 +30,9 @@ query = (bbox) ->
   return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
 
 
-module.exports = ->
+data = module.exports = {}
+
+data.region = ->
   deferred = Q.defer()
   bboxCiucas = [25.845, 45.437, 26.043, 45.562]
   q = query(bboxCiucas)
@@ -115,3 +125,18 @@ compile = (bbox, osm) ->
     bbox: bbox
     routes: route(obj[id]) for id in routeIds.values()
   }
+
+
+data.dem = ->
+  demDone = Q.defer()
+  bbox = [25.845, 45.437, 26.043, 45.562]
+
+  exec("gdalwarp data/srtm-1arcsec-ro.tiff data/srtm-1arcsec-ciucas.tiff -te #{bbox.join(' ')}")
+  .then ->
+    exec("gdal_contour data/srtm-1arcsec-ciucas.tiff data/contours/ciucas.shp -i 100")
+  .then ->
+    exec("topojson contour=data/contours/ciucas.shp -o data/contours/ciucas.topojson -s .00000000001")
+  .done ->
+    demDone.resolve()
+
+  return demDone.promise
