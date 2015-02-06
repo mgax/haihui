@@ -5,13 +5,13 @@ index = (objects) ->
   return map
 
 
-initialize = (map) ->
-  segmentLayer = topojson.feature(map.topo, map.topo.objects.segments).features
+initialize = (db) ->
+  segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = index(segmentLayer)
 
-  poiLayer = topojson.feature(map.topo, map.topo.objects.poi).features
+  poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
 
-  for route in map.routes
+  for route in db.routes
     for id in route.segments
       segment = segmentMap.get(id)
       segment.properties.symbols = [] unless segment.properties.symbols?
@@ -19,7 +19,7 @@ initialize = (map) ->
 
   width = 1
   height = 1
-  center = [(map.bbox[0] + map.bbox[2]) / 2, (map.bbox[1] + map.bbox[3]) / 2]
+  center = [(db.bbox[0] + db.bbox[2]) / 2, (db.bbox[1] + db.bbox[3]) / 2]
   s0 = 1
   sc = 1
   t0 = [0, 0]
@@ -32,8 +32,8 @@ initialize = (map) ->
       .parallels([center[1] - 5, center[1] + 5])
       .scale(1)
 
-  _sw = projection(map.bbox.slice(0, 2))
-  _ne = projection(map.bbox.slice(2, 4))
+  _sw = projection(db.bbox.slice(0, 2))
+  _ne = projection(db.bbox.slice(2, 4))
   boxWidth = _ne[0] - _sw[0]
   boxHeight = _sw[1] - _ne[1]
 
@@ -175,6 +175,6 @@ initialize = (map) ->
   navigator.geolocation.watchPosition(positionOk, positionErr)
 
 
-d3.json 'build/ciucas.json', (error, map) ->
+d3.json 'build/ciucas.json', (error, db) ->
   if error then return console.error(error)
-  initialize(map)
+  initialize(db)

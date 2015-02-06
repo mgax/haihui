@@ -28,8 +28,8 @@ module.exports = ->
   q = query(bboxCiucas)
   url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
   request url, (err, res, body) ->
-    map = compile(bboxCiucas, JSON.parse(body))
-    fs.writeFileSync('build/ciucas.json', JSON.stringify(map))
+    db = compile(bboxCiucas, JSON.parse(body))
+    fs.writeFileSync('build/ciucas.json', JSON.stringify(db))
     deferred.resolve()
 
   return deferred.promise
