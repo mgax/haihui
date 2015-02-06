@@ -24,6 +24,7 @@ initialize = (map) ->
   sc = 1
   t0 = [0, 0]
   tr = [0, 0]
+  location = null
 
   projection = d3.geo.albers()
       .center([0, center[1]])
@@ -46,6 +47,14 @@ initialize = (map) ->
 
   segments = svg.append('g')
   symbols = svg.append('g')
+  locationg = svg.append('g').attr('class', 'location')
+
+  locationg.append('circle')
+      .attr('class', 'midpoint')
+      .attr('r', 2)
+
+  locationg.append('circle')
+      .attr('class', 'accuracy')
 
   svg.append('rect')
       .attr('class', 'zoomrect')
@@ -107,6 +116,23 @@ initialize = (map) ->
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
 
+  showLocation = () ->
+    g = svg.select('.location')
+
+    unless location?
+      g.style('display', 'none')
+      return
+
+    xy = projection(location.pos)
+    ra = location.accuracy / 20000000 * 180
+    xya = projection([location.pos[0], location.pos[1] + ra])
+
+    g.style('display', null)
+        .attr('transform', "translate(#{xy})")
+
+    g.select('.accuracy')
+        .attr('r', xy[1] - xya[1])
+
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
@@ -121,16 +147,32 @@ initialize = (map) ->
 
     render()
     renderSymbols()
+    showLocation()
 
   zoom.on 'zoom', ->
     tr = d3.event.translate
     sc = d3.event.scale
     render()
     updateSymbols()
+    showLocation()
 
   zoom.on('zoomend', renderSymbols)
   d3.select(window).on('resize', resize)
   resize()
+
+  positionOk = (evt) ->
+    coords = evt.coords
+    location = {
+      pos: [coords.longitude, coords.latitude]
+      accuracy: coords.accuracy
+    }
+    showLocation()
+
+  positionErr = ->
+    location = null
+    showLocation()
+
+  navigator.geolocation.watchPosition(positionOk, positionErr)
 
 
 d3.json 'build/ciucas.json', (error, map) ->
