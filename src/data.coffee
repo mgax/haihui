@@ -180,3 +180,21 @@ data.dem = (region) ->
     demDone.resolve()
 
   return demDone.promise
+
+
+data.html = ->
+  Handlebars = require('handlebars')
+  template = (name) ->
+    Handlebars.compile(fs.readFileSync("templates/#{name}", encoding: 'utf-8'))
+
+  index_html = template('index.html')
+  region_html = template('region.html')
+
+  regions = Object.keys(REGION).sort()
+  for region in regions
+    ensureDir("build/#{region}")
+    fs.writeFileSync("build/#{region}/index.html", region_html())
+
+  fs.writeFileSync("build/index.html", index_html(regions: regions))
+
+  fs.writeFileSync("build/turfbits.js", fs.readFileSync("turfbits.js"))

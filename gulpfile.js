@@ -31,6 +31,12 @@ gulp.task('data', function() {
 });
 
 
+gulp.task('html', function() {
+  require('coffee-script/register');
+  return require('./src/data.coffee').html();
+});
+
+
 gulp.task('ui', function() {
   gulp.src(['./src/symbol.coffee', './src/ui.coffee'])
     .pipe(sourcemaps.init())

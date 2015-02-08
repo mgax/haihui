@@ -184,6 +184,7 @@ initialize = (db) ->
   navigator.geolocation.watchPosition(positionOk, positionErr)
 
 
-d3.json 'build/ciucas.json', (error, db) ->
-  if error then return console.error(error)
-  initialize(db)
+app.load = (url) ->
+  d3.json url, (error, db) ->
+    if error then return console.error(error)
+    initialize(db)
