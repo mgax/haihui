@@ -67,7 +67,7 @@ initialize = (db) ->
       .attr('class', 'segment')
 
   contours.selectAll('.contour')
-      .data(topojson.feature(db.contours, db.contours.objects.contour).features)
+      .data(topojson.feature(db.dem, db.dem.objects.contour).features)
     .enter().append('path')
       .attr('class', 'contour')
 
@@ -186,7 +186,4 @@ initialize = (db) ->
 
 d3.json 'build/ciucas.json', (error, db) ->
   if error then return console.error(error)
-  d3.json 'build/ciucas-contour.topojson', (error, contours) ->
-    if error then return console.error(error)
-    db.contours = contours
-    initialize(db)
+  initialize(db)

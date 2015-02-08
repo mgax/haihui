@@ -122,6 +122,7 @@ compile = (bbox, osm) ->
       quantization: 1000000
       'property-transform': (f) -> f.properties
     })
+    dem: JSON.parse(fs.readFileSync('data/contours/ciucas.topojson'))
     bbox: bbox
     routes: route(obj[id]) for id in routeIds.values()
   }
