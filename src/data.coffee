@@ -7,11 +7,20 @@ turf = require('turf')
 Q = require('q')
 
 
+REGION = {
+  ciucas: [25.845, 45.437, 26.043, 45.562]
+}
+
+
 exec = (cmd) ->
   done = Q.defer()
   console.log cmd
   child_process.exec cmd, done.resolve
   return done.promise
+
+
+ensureDir = (path) ->
+  fs.mkdirSync(path) unless fs.existsSync(path)
 
 
 query = (bbox) ->
@@ -32,20 +41,30 @@ query = (bbox) ->
 
 data = module.exports = {}
 
-data.region = ->
+data.build = (region) ->
   deferred = Q.defer()
-  bboxCiucas = [25.845, 45.437, 26.043, 45.562]
-  q = query(bboxCiucas)
-  url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
-  request url, (err, res, body) ->
-    db = compile(bboxCiucas, JSON.parse(body))
-    fs.writeFileSync('build/ciucas.json', JSON.stringify(db))
-    deferred.resolve()
+
+  data.dem(region)
+
+  .then ->
+    bbox = REGION[region]
+    q = query(bbox)
+    url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
+    console.log("overpass:", q)
+
+    request url, (err, res, body) ->
+      dem = JSON.parse(fs.readFileSync("data/contours/#{region}.topojson"))
+      p = JSON.parse(body)
+      db = compileOsm(bbox, p, dem)
+      ensureDir("build/#{region}")
+      fs.writeFileSync("build/#{region}/data.json", JSON.stringify(db))
+      console.log("done", region)
+      deferred.resolve()
 
   return deferred.promise
 
 
-compile = (bbox, osm) ->
+compileOsm = (bbox, osm, dem) ->
   obj = {}
   routeIds = d3.set()
   segmentIds = d3.set()
@@ -122,21 +141,30 @@ compile = (bbox, osm) ->
       quantization: 1000000
       'property-transform': (f) -> f.properties
     })
-    dem: JSON.parse(fs.readFileSync('data/contours/ciucas.topojson'))
+    dem: dem
     bbox: bbox
     routes: route(obj[id]) for id in routeIds.values()
   }
 
 
-data.dem = ->
+data.dem = (region) ->
   demDone = Q.defer()
-  bbox = [25.845, 45.437, 26.043, 45.562]
+  bbox = REGION[region]
 
-  exec("gdalwarp data/srtm-1arcsec-ro.tiff data/srtm-1arcsec-ciucas.tiff -te #{bbox.join(' ')}")
+  exec("gdalwarp
+        data/srtm-1arcsec-ro.tiff
+        data/srtm-1arcsec-#{region}.tiff
+        -te #{bbox.join(' ')}")
   .then ->
-    exec("gdal_contour data/srtm-1arcsec-ciucas.tiff data/contours/ciucas.shp -i 100")
+    exec("gdal_contour
+          data/srtm-1arcsec-#{region}.tiff
+          data/contours/#{region}.shp
+          -i 100")
   .then ->
-    exec("topojson contour=data/contours/ciucas.shp -o data/contours/ciucas.topojson -s .00000000001")
+    exec("topojson
+          contour=data/contours/#{region}.shp
+          -o data/contours/#{region}.topojson
+          -s .00000000001")
   .done ->
     demDone.resolve()
 

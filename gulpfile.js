@@ -19,15 +19,9 @@ gulp.task('serve', function() {
 });
 
 
-gulp.task('dem', function() {
-  require('coffee-script/register');
-  return require('./src/data.coffee').dem();
-});
-
-
 gulp.task('data', function() {
   require('coffee-script/register');
-  return require('./src/data.coffee').region();
+  return require('./src/data.coffee').build('ciucas');
 });
 
 
