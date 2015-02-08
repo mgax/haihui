@@ -32,6 +32,7 @@ app.symbol.osmc = (src) ->
 
       when 'dot'
         selection.append('circle')
+            .attr('class', "graphic color-#{sym.color}")
             .attr('r', size  * .4)
 
       when 'cross'
