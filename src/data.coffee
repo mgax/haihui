@@ -9,6 +9,7 @@ Q = require('q')
 
 REGION = {
   ciucas: [25.845, 45.437, 26.043, 45.562]
+  fagaras: [24.30, 45.47, 24.89, 45.73]
 }
 
 
@@ -41,7 +42,17 @@ query = (bbox) ->
 
 data = module.exports = {}
 
+data.buildAll = ->
+  def = Q()
+
+  Object.keys(REGION).sort().forEach (region) ->
+    def = def.then ->
+      data.build(region)
+
+  return def
+
 data.build = (region) ->
+  console.log("building", region)
   deferred = Q.defer()
 
   data.dem(region)
