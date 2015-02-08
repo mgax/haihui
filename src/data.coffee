@@ -164,11 +164,11 @@ data.dem = (region) ->
 
   exec("gdalwarp
         data/srtm-1arcsec-ro.tiff
-        data/srtm-1arcsec-#{region}.tiff
+        data/contours/#{region}.tiff
         -te #{bbox.join(' ')}")
   .then ->
     exec("gdal_contour
-          data/srtm-1arcsec-#{region}.tiff
+          data/contours/#{region}.tiff
           data/contours/#{region}.shp
           -i 100")
   .then ->
