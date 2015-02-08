@@ -10,7 +10,7 @@ var gulp = require('gulp'),
 gulp.task('serve', function() {
   var host = '0.0.0.0';
   var port = +(process.env.PORT || 5000);
-  var app = express().use('/', express.static(__dirname));
+  var app = express().use('/', express.static(__dirname + '/build'));
   http.createServer(app).listen(port, host, function() {
     console.log('devel server listening on ' + host + ':' + port);
   })
