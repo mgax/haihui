@@ -1,3 +1,6 @@
+PXKM = 6250  # convert pixels to kilometers
+
+
 index = (objects) ->
   map = d3.map()
   for o in objects
@@ -13,6 +16,7 @@ initialize = (db) ->
   segmentMap = index(segmentLayer)
 
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
+  contourLayer = topojson.feature(db.dem, db.dem.objects.contour).features
 
   for route in db.routes
     for id in route.segments
@@ -78,9 +82,10 @@ initialize = (db) ->
       .attr('class', 'segment')
 
   contours.selectAll('.contour')
-      .data(topojson.feature(db.dem, db.dem.objects.contour).features)
+      .data(contourLayer)
     .enter().append('path')
       .attr('class', 'contour')
+      .attr('id', (d) -> "contour-#{d.id}")
 
   render = ->
     projection
@@ -93,10 +98,23 @@ initialize = (db) ->
     contours.selectAll('.contour')
         .attr('d', path)
 
+    contours.selectAll('.contour-label').remove()
+
+    for ring in contourLayer
+      length = turf.lineDistance(ring, 'kilometers') * (s0 * sc) / PXKM
+      labelCount = Math.floor(length / 500)
+      for n in d3.range(0, labelCount)
+        contours.append('text')
+            .attr('class', 'contour-label')
+            .append('textPath')
+              .attr('xlink:href', "#contour-#{ring.id}")
+              .attr('startOffset', "#{(n + .5) / labelCount * 100}%")
+              .text(ring.properties.elevation)
+
   renderSymbols = ->
     symbols.selectAll('.symbol').remove()
 
-    interval = 500000 / (s0 * sc)
+    interval = 80 * PXKM / (s0 * sc)
     segmentSymbols = []
     for segment in segmentLayer
       length = turf.lineDistance(segment, 'kilometers')
