@@ -6,6 +6,9 @@ index = (objects) ->
 
 
 initialize = (db) ->
+  topojson.presimplify(db.topo)
+  topojson.presimplify(db.dem)
+
   segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = index(segmentLayer)
 
@@ -24,6 +27,7 @@ initialize = (db) ->
   sc = 1
   t0 = [0, 0]
   tr = [0, 0]
+  f0 = 1
   location = null
 
   projection = d3.geo.albers()
@@ -40,8 +44,15 @@ initialize = (db) ->
   zoom = d3.behavior.zoom()
       .scaleExtent([1, 1000])
 
+  simplify = d3.geo.transform(
+    point: (x, y, z) ->
+      if z? and z >= f0 / sc / 300
+        [a, b] = projection([x, y])
+        return @stream.point(a, b)
+  )
+
   path = d3.geo.path()
-      .projection(projection)
+      .projection(simplify)
 
   svg = d3.select('body').append('svg')
 
@@ -147,6 +158,7 @@ initialize = (db) ->
     height = parseInt(d3.select('body').style('height'))
 
     projection.scale(s0 = d3.min([width / boxWidth, height / boxHeight]))
+    f0 = (db.bbox[2] - db.bbox[0]) / boxWidth / s0
 
     svg.select('.zoomrect')
         .attr('width', width)
