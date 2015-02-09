@@ -166,6 +166,8 @@ initialize = (db) ->
 
     projection.translate(t0 = [width / 2, height / 2])
 
+    zoom.scale(sc = 1).translate(tr = [0, 0])
+
     render()
     renderSymbols()
     showLocation()
