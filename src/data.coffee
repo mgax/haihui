@@ -172,11 +172,14 @@ data.dem = (region) ->
     exec("gdal_contour
           data/contours/#{region}.tiff
           data/contours/#{region}.shp
+          -a elevation
           -i 100")
   .then ->
     exec("topojson
           contour=data/contours/#{region}.shp
           -o data/contours/#{region}.topojson
+          --id-property ID
+          -p elevation
           -s .00000000001")
   .done ->
     demDone.resolve()
