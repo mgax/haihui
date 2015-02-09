@@ -85,6 +85,7 @@ initialize = (db) ->
       .data(contourLayer)
     .enter().append('path')
       .attr('class', 'contour')
+      .classed('contour-minor', (d) -> d.properties.elevation % 300)
       .attr('id', (d) -> "contour-#{d.id}")
 
   render = ->
@@ -101,6 +102,7 @@ initialize = (db) ->
     contours.selectAll('.contour-label').remove()
 
     for ring in contourLayer
+      continue if ring.properties.elevation % 300
       length = turf.lineDistance(ring, 'kilometers') * (s0 * sc) / PXKM
       labelCount = Math.floor(length / 500)
       for n in d3.range(0, labelCount)
