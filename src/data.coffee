@@ -14,6 +14,12 @@ REGION = {
   iezer: [24.85, 45.38, 25.10, 45.55]
 }
 
+SLEEPING_PLACE = {
+  'chalet': true
+  'alpine_hut': true
+  'hotel': true
+}
+
 
 exec = (cmd) ->
   done = Q.defer()
@@ -31,13 +37,11 @@ query = (bbox) ->
     {t: 'relation', k: 'route',   v: 'hiking'}
     {t: 'node',     k: 'natural', v: 'saddle'}
     {t: 'node',     k: 'natural', v: 'peak'}
-    {t: 'node',     k: 'tourism', v: 'chalet'}
-    {t: 'way',      k: 'tourism', v: 'chalet'}
-    {t: 'node',     k: 'tourism', v: 'alpine_hut'}
-    {t: 'way',      k: 'tourism', v: 'alpine_hut'}
+    {t: 'node',     k: 'tourism', v: '', op: '~'}
+    {t: 'way',      k: 'tourism', v: '', op: '~'}
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
-  item = (f) -> "#{f.t}[\"#{f.k}\"=\"#{f.v}\"](#{overpassBbox});"
+  item = (f) -> "#{f.t}[\"#{f.k}\"#{f.op or '='}\"#{f.v}\"](#{overpassBbox});"
   items = (item(f) for f in filters).join('')
   return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
 
@@ -140,7 +144,7 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'node' and o.tags.natural?
       poi.push(natural(o))
 
-    if o.tags.tourism == 'chalet' or o.tags.tourism == 'alpine_hut'
+    if SLEEPING_PLACE[o.tags.tourism]
       if o.type == 'node' or o.type == 'way'
         poi.push(tourism(o))
 

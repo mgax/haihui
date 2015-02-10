@@ -68,6 +68,7 @@ app.symbol.alpine_hut = (selection) ->
       .attr('y', -2)
 
 app.symbol.chalet = app.symbol.alpine_hut
+app.symbol.hotel = app.symbol.alpine_hut
 
 
 app.symbol.peak = (selection) ->
