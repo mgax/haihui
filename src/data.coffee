@@ -128,7 +128,6 @@ compileOsm = (bbox, osm, dem) ->
       when 'track' then 'path'
       when 'path' then 'path'
       when 'footway' then 'path'
-      when 'service' then null
       when 'residential' then null
       when 'living_street' then null
       else 'road'
