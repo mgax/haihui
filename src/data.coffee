@@ -34,11 +34,13 @@ ensureDir = (path) ->
 
 query = (bbox) ->
   filters = [
-    {t: 'relation', k: 'route',   v: 'hiking'}
-    {t: 'node',     k: 'natural', v: 'saddle'}
-    {t: 'node',     k: 'natural', v: 'peak'}
-    {t: 'node',     k: 'tourism', v: '', op: '~'}
-    {t: 'way',      k: 'tourism', v: '', op: '~'}
+    {t: 'relation', k: 'route',    v: 'hiking'}
+    {t: 'node',     k: 'natural',  v: 'saddle'}
+    {t: 'node',     k: 'natural',  v: 'peak'}
+    {t: 'way',      k: 'highway',  v: '', op: '~'}
+    {t: 'way',      k: 'waterway', v: '', op: '~'}
+    {t: 'node',     k: 'tourism',  v: '', op: '~'}
+    {t: 'way',      k: 'tourism',  v: '', op: '~'}
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f.t}[\"#{f.k}\"#{f.op or '='}\"#{f.v}\"](#{overpassBbox});"
@@ -86,6 +88,8 @@ compileOsm = (bbox, osm, dem) ->
   routeIds = d3.set()
   segmentIds = d3.set()
   poi = []
+  roads = []
+  rivers = []
 
   pos = (id) ->
     node = obj[id]
@@ -118,6 +122,12 @@ compileOsm = (bbox, osm, dem) ->
     }
     return f
 
+  road = (obj) ->
+    turf.linestring(pos(n) for n in obj.nodes)
+
+  river = (obj) ->
+    turf.linestring(pos(n) for n in obj.nodes)
+
   route = (relation) ->
     segments = []
     for m in relation.members
@@ -148,9 +158,17 @@ compileOsm = (bbox, osm, dem) ->
       if o.type == 'node' or o.type == 'way'
         poi.push(tourism(o))
 
+    if o.type == 'way' and o.tags.highway?
+      roads.push(road(o))
+
+    if o.type == 'way' and o.tags.waterway?
+      rivers.push(river(o))
+
   layers = {
     segments: turf.featurecollection(segment(id) for id in segmentIds.values())
     poi: turf.featurecollection(poi)
+    roads: turf.featurecollection(roads)
+    rivers: turf.featurecollection(rivers)
   }
 
   return {
