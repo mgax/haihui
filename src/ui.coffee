@@ -67,10 +67,10 @@ initialize = (db) ->
 
   svg = d3.select('body').append('svg')
 
-  segments = svg.append('g')
   contours = svg.append('g')
   rivers = svg.append('g')
   highways = svg.append('g')
+  segments = svg.append('g')
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
   scaleg = svg.append('g')
