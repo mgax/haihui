@@ -1,4 +1,5 @@
 PXKM = 6250  # convert pixels to kilometers
+DEGM = 20000000 / 180 # convert degrees to meters
 
 
 index = (objects) ->
@@ -164,7 +165,7 @@ initialize = (db) ->
       return
 
     xy = projection(location.pos)
-    ra = location.accuracy / 20000000 * 180
+    ra = location.accuracy / DEGM
     xya = projection([location.pos[0], location.pos[1] + ra])
 
     g.style('display', null)
