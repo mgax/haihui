@@ -88,7 +88,7 @@ compileOsm = (bbox, osm, dem) ->
   routeIds = d3.set()
   segmentIds = d3.set()
   poi = []
-  roads = []
+  highways = []
   rivers = []
 
   pos = (id) ->
@@ -122,8 +122,19 @@ compileOsm = (bbox, osm, dem) ->
     }
     return f
 
-  road = (obj) ->
-    turf.linestring(pos(n) for n in obj.nodes)
+  highway = (obj) ->
+    f = turf.linestring(pos(n) for n in obj.nodes)
+    grade = switch obj.tags.highway
+      when 'track' then 'path'
+      when 'path' then 'path'
+      when 'footway' then 'path'
+      when 'service' then null
+      when 'residential' then null
+      when 'living_street' then null
+      else 'road'
+    return unless grade?
+    f.properties = {grade: grade}
+    return f
 
   river = (obj) ->
     turf.linestring(pos(n) for n in obj.nodes)
@@ -159,7 +170,8 @@ compileOsm = (bbox, osm, dem) ->
         poi.push(tourism(o))
 
     if o.type == 'way' and o.tags.highway?
-      roads.push(road(o))
+      r = highway(o)
+      if r? then highways.push(r)
 
     if o.type == 'way' and o.tags.waterway?
       rivers.push(river(o))
@@ -167,7 +179,7 @@ compileOsm = (bbox, osm, dem) ->
   layers = {
     segments: turf.featurecollection(segment(id) for id in segmentIds.values())
     poi: turf.featurecollection(poi)
-    roads: turf.featurecollection(roads)
+    highways: turf.featurecollection(highways)
     rivers: turf.featurecollection(rivers)
   }
 

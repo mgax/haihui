@@ -19,6 +19,8 @@ initialize = (db) ->
   segmentMap = index(segmentLayer)
 
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
+  riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
+  highwaysLayer = topojson.feature(db.topo, db.topo.objects.highways).features
   contourLayer = topojson.feature(db.dem, db.dem.objects.contour).features
 
   for route in db.routes
@@ -67,6 +69,8 @@ initialize = (db) ->
 
   segments = svg.append('g')
   contours = svg.append('g')
+  rivers = svg.append('g')
+  highways = svg.append('g')
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
   scaleg = svg.append('g')
@@ -96,12 +100,28 @@ initialize = (db) ->
       .classed('contour-minor', (d) -> d.properties.elevation % 300)
       .attr('id', (d) -> "contour-#{d.id}")
 
+  rivers.selectAll('.river')
+      .data(riversLayer)
+    .enter().append('path')
+      .attr('class', 'river')
+
+  highways.selectAll('.highway')
+      .data(highwaysLayer)
+    .enter().append('path')
+      .attr('class', (d) -> "highway highway-#{d.properties.grade}")
+
   render = ->
     projection
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
 
     segments.selectAll('.segment')
+        .attr('d', path)
+
+    rivers.selectAll('.river')
+        .attr('d', path)
+
+    highways.selectAll('.highway')
         .attr('d', path)
 
     contours.selectAll('.contour')
