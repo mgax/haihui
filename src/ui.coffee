@@ -55,8 +55,10 @@ initialize = (db) ->
         return @stream.point(a, b)
   )
 
+  clip = d3.geo.clipExtent()
+
   path = d3.geo.path()
-      .projection(simplify)
+      .projection(stream: (s) -> simplify.stream(clip.stream(s)))
 
   svg = d3.select('body').append('svg')
 
@@ -104,14 +106,12 @@ initialize = (db) ->
     for ring in contourLayer
       continue if ring.properties.elevation % 300
       length = turf.lineDistance(ring, 'kilometers') * (s0 * sc) / PXKM
-      labelCount = Math.floor(length / 500)
-      for n in d3.range(0, labelCount)
-        contours.append('text')
-            .attr('class', 'contour-label')
-            .append('textPath')
-              .attr('xlink:href', "#contour-#{ring.id}")
-              .attr('startOffset', "#{(n + .5) / labelCount * 100}%")
-              .text(ring.properties.elevation)
+      contours.append('text')
+          .attr('class', 'contour-label')
+          .append('textPath')
+            .attr('xlink:href', "#contour-#{ring.id}")
+            .attr('startOffset', "50%")
+            .text(ring.properties.elevation)
 
   renderSymbols = ->
     symbols.selectAll('.symbol').remove()
@@ -176,6 +176,8 @@ initialize = (db) ->
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
+
+    clip.extent([[0, 0], [width, height]])
 
     projection.scale(s0 = d3.min([width / boxWidth, height / boxHeight]))
     f0 = (db.bbox[2] - db.bbox[0]) / boxWidth / s0
