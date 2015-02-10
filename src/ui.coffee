@@ -1,5 +1,7 @@
 PXKM = 6250  # convert pixels to kilometers
 DEGM = 20000000 / 180 # convert degrees to meters
+siFormat = d3.format('s')
+distanceFormat = (d) -> if d == 0 then '0' else "#{siFormat(d)}m"
 
 
 index = (objects) ->
@@ -67,6 +69,9 @@ initialize = (db) ->
   contours = svg.append('g')
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
+  scaleg = svg.append('g')
+      .attr('class', 'scale')
+      .attr('transform', "translate(10.5, 10.5)")
 
   locationg.append('circle')
       .attr('class', 'midpoint')
@@ -174,6 +179,21 @@ initialize = (db) ->
     g.select('.accuracy')
         .attr('r', xy[1] - xya[1])
 
+  renderScale = ->
+    deg_150px = (projection.invert([150, 0])[0] - projection.invert([0, 0])[0])
+    mapscale = d3.scale.linear()
+     .domain([0, deg_150px * DEGM])
+     .rangeRound([0, 150])
+
+    scaleg.selectAll().remove()
+    axis = d3.svg.axis()
+        .scale(mapscale)
+        .orient('bottom')
+        .ticks(2)
+        .tickSize(6, 0)
+        .tickFormat(distanceFormat)
+    scaleg.call(axis)
+
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
@@ -194,6 +214,7 @@ initialize = (db) ->
     render()
     renderSymbols()
     showLocation()
+    renderScale()
 
   zoom.on 'zoom', ->
     tr = d3.event.translate
@@ -201,6 +222,7 @@ initialize = (db) ->
     render()
     updateSymbols()
     showLocation()
+    renderScale()
 
   zoom.on('zoomend', renderSymbols)
   d3.select(window).on('resize', resize)
