@@ -37,6 +37,22 @@ gulp.task('html', function() {
 });
 
 
+gulp.task('libs', function() {
+  var done = Q.defer();
+  var request = require('request');
+  var fs = require('fs');
+  var cdnjs = 'http://cdnjs.cloudflare.com/ajax/libs/';
+  request(cdnjs + 'd3/3.5.3/d3.min.js', function(err, res, body) {
+    fs.writeFileSync('build/d3.min.js', body);
+    request(cdnjs + 'topojson/1.6.9/topojson.min.js', function(err, res, body) {
+      fs.writeFileSync('build/topojson.min.js', body);
+      done.resolve();
+    });
+  });
+  return done.promise;
+});
+
+
 gulp.task('ui', function() {
   gulp.src(['./src/symbol.coffee', './src/ui.coffee'])
     .pipe(sourcemaps.init())
@@ -57,4 +73,4 @@ gulp.task('auto', function() {
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui']);
+gulp.task('default', ['data', 'ui', 'html', 'libs']);
