@@ -227,11 +227,15 @@ data.html = ->
 
   index_html = template('index.html')
   region_html = template('region.html')
+  manifest_appcache = template('manifest.appcache')
 
+  timestamp = (new Date()).toJSON()
   regions = Object.keys(REGION).sort()
   for region in regions
     ensureDir("build/#{region}")
     fs.writeFileSync("build/#{region}/index.html", region_html())
+    manifest = manifest_appcache(timestamp: timestamp)
+    fs.writeFileSync("build/#{region}/manifest.appcache", manifest)
 
   fs.writeFileSync("build/index.html", index_html(regions: regions))
 

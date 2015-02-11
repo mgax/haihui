@@ -1,0 +1,19 @@
+CACHE MANIFEST
+
+# rev {{ timestamp }}
+
+CACHE:
+./
+../ui.css
+../d3.min.js
+../topojson.min.js
+../turfbits.js
+../symbol.js
+../ui.js
+./data.json
+
+
+NETWORK:
+../ui.js.map
+../symbol.js.map
+../ui.css.map
