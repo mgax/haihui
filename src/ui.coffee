@@ -120,10 +120,6 @@ initialize = (db) ->
       .attr('class', (d) -> "highway highway-#{d.properties.grade}")
 
   render = ->
-    projection
-        .scale(s0 * sc)
-        .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
-
     segments.selectAll('.segment')
         .attr('d', path)
 
@@ -239,7 +235,8 @@ initialize = (db) ->
 
     projection.translate(t0 = [width / 2, height / 2])
 
-    zoom.scale(sc = 1).translate(tr = [0, 0])
+    zoom.scale(1).translate([0, 0])
+    updateProjection(1, [0, 0])
 
     actionbar.attr('transform', "translate(0, #{height - ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', width)
@@ -249,9 +246,15 @@ initialize = (db) ->
     showLocation()
     renderScale()
 
+  updateProjection = (new_sc, new_tr) ->
+    sc = new_sc
+    tr = new_tr
+    projection
+        .scale(s0 * sc)
+        .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
+
   zoom.on 'zoom', ->
-    tr = d3.event.translate
-    sc = d3.event.scale
+    updateProjection(d3.event.scale, d3.event.translate)
     render()
     updateSymbols()
     showLocation()
