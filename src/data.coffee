@@ -197,10 +197,12 @@ data.dem = (region) ->
   demDone = Q.defer()
   bbox = REGION[region].bbox
 
-  exec("gdalwarp
-        data/srtm-1arcsec-ro.tiff
-        data/contours/#{region}.tiff
-        -te #{bbox.join(' ')}")
+  exec("rm -f data/contours/#{region}.*")
+  .then ->
+    exec("gdalwarp
+          data/srtm-1arcsec-ro.tiff
+          data/contours/#{region}.tiff
+          -te #{bbox.join(' ')}")
   .then ->
     exec("gdal_contour
           data/contours/#{region}.tiff
