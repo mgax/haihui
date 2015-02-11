@@ -182,7 +182,8 @@ initialize = (db) ->
       .enter().append('g')
         .attr('class', 'symbol poiSymbol')
         .each (poi) ->
-          app.symbol[poi.properties.type](d3.select(@))
+          if (drawSymbol = app.symbol[poi.properties.type])?
+            drawSymbol(d3.select(@))
 
     updateSymbols()
 
