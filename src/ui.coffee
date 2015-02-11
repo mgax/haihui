@@ -1,5 +1,6 @@
 PXKM = 6250  # convert pixels to kilometers
 DEGM = 20000000 / 180 # convert degrees to meters
+ACTIONBAR_HEIGHT = 30
 siFormat = d3.format('s')
 distanceFormat = (d) -> if d == 0 then '0' else "#{siFormat(d)}m"
 
@@ -73,9 +74,6 @@ initialize = (db) ->
   segments = svg.append('g')
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
-  scaleg = svg.append('g')
-      .attr('class', 'scale')
-      .attr('transform', "translate(10.5, 10.5)")
 
   locationg.append('circle')
       .attr('class', 'midpoint')
@@ -87,6 +85,17 @@ initialize = (db) ->
   svg.append('rect')
       .attr('class', 'zoomrect')
       .call(zoom)
+
+  actionbar = svg.append('g')
+      .attr('class', 'actionbar')
+
+  actionbar.append('rect')
+      .attr('class', 'background')
+      .attr('height', ACTIONBAR_HEIGHT)
+
+  scaleg = actionbar.append('g')
+      .attr('class', 'scale')
+      .attr('transform', "translate(10.5, 5.5)")
 
   segments.selectAll('.segment')
       .data(segmentLayer)
@@ -230,6 +239,9 @@ initialize = (db) ->
     projection.translate(t0 = [width / 2, height / 2])
 
     zoom.scale(sc = 1).translate(tr = [0, 0])
+
+    actionbar.attr('transform', "translate(0, #{height - ACTIONBAR_HEIGHT})")
+    actionbar.select('.background').attr('width', width)
 
     render()
     renderSymbols()
