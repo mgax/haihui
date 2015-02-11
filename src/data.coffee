@@ -8,10 +8,10 @@ Q = require('q')
 
 
 REGION = {
-  ciucas: [25.845, 45.437, 26.043, 45.562]
-  crai: [25.17, 45.49, 25.29, 45.57]
-  fagaras: [24.30, 45.47, 24.89, 45.73]
-  iezer: [24.85, 45.38, 25.10, 45.55]
+  ciucas:  {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș"}
+  crai:    {bbox: [25.17, 45.49, 25.29, 45.57], title: "Piatra Craiului"}
+  fagaras: {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș"}
+  iezer:   {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer"}
 }
 
 SLEEPING_PLACE = {
@@ -66,7 +66,7 @@ data.build = (region) ->
   data.dem(region)
 
   .then ->
-    bbox = REGION[region]
+    bbox = REGION[region].bbox
     q = query(bbox)
     url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
@@ -195,7 +195,7 @@ compileOsm = (bbox, osm, dem) ->
 
 data.dem = (region) ->
   demDone = Q.defer()
-  bbox = REGION[region]
+  bbox = REGION[region].bbox
 
   exec("gdalwarp
         data/srtm-1arcsec-ro.tiff
@@ -237,6 +237,7 @@ data.html = ->
     manifest = manifest_appcache(timestamp: timestamp)
     fs.writeFileSync("build/#{region}/manifest.appcache", manifest)
 
-  fs.writeFileSync("build/index.html", index_html(regions: regions))
+  regionList = ({slug: r, title: REGION[r].title} for r in regions)
+  fs.writeFileSync("build/index.html", index_html(regionList: regionList))
 
   fs.writeFileSync("build/turfbits.js", fs.readFileSync("turfbits.js"))
