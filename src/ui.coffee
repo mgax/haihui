@@ -1,6 +1,9 @@
 PXKM = 6250  # convert pixels to kilometers
 DEGM = 20000000 / 180 # convert degrees to meters
 ACTIONBAR_HEIGHT = 30
+LOCATION_OFF = 0
+LOCATION_SHOW = 1
+LOCATION_TRACK = 2
 siFormat = d3.format('s')
 distanceFormat = (d) -> if d == 0 then '0' else "#{siFormat(d)}m"
 
@@ -10,6 +13,10 @@ index = (objects) ->
   for o in objects
     map.set(o.id, o)
   return map
+
+
+inside = (pos, bbox) ->
+  bbox[0] <= pos[0] and pos[0] < bbox[2] and bbox[1] <= pos[1] and pos[1] < bbox[3]
 
 
 initialize = (db) ->
@@ -39,6 +46,8 @@ initialize = (db) ->
   tr = [0, 0]
   f0 = 1
   location = null
+  locationMode = LOCATION_OFF
+  locationWatch = null
 
   projection = d3.geo.albers()
       .center([0, center[1]])
@@ -96,6 +105,40 @@ initialize = (db) ->
   scaleg = actionbar.append('g')
       .attr('class', 'scale')
       .attr('transform', "translate(10.5, 5.5)")
+
+  locationbuttong = actionbar.append('g')
+      .attr('class', 'locationbutton')
+      .attr('transform', "translate(200, #{ACTIONBAR_HEIGHT / 2})")
+
+  locationbuttong.append('g')
+      .attr('class', 'symbol-locationbutton')
+
+  locationbuttong.append('rect')
+      .attr('class', 'buttonmask')
+      .attr('x', -15)
+      .attr('y', -15)
+      .attr('width', 30)
+      .attr('height', 30)
+      .on 'click', ->
+        switch locationMode
+          when LOCATION_OFF
+            locationMode = LOCATION_SHOW
+            locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide)
+            locationbuttong.classed('locating', true)
+
+          when LOCATION_SHOW
+            locationMode = LOCATION_TRACK
+            locationbuttong.classed('tracking', true)
+            positionUpdate()
+
+          when LOCATION_TRACK
+            locationMode = LOCATION_OFF
+            locationbuttong.classed('tracking', false)
+            locationbuttong.classed('locating', false)
+            navigator.geolocation.clearWatch(locationWatch)
+            positionHide()
+
+  app.symbol.locationbutton(locationbuttong.select('.symbol-locationbutton'))
 
   segments.selectAll('.segment')
       .data(segmentLayer)
@@ -241,6 +284,9 @@ initialize = (db) ->
     actionbar.attr('transform', "translate(0, #{height - ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', width)
 
+    redraw()
+
+  redraw = ->
     render()
     renderSymbols()
     showLocation()
@@ -252,6 +298,15 @@ initialize = (db) ->
     projection
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
+
+  centerAt = (pos) ->
+    new_sc = 8000000 / s0
+    updateProjection(new_sc, [0, 0])
+    xy = projection(pos)
+    new_tr = [width / 2 - xy[0], height / 2 - xy[1]]
+    zoom.scale(new_sc).translate(new_tr)
+    updateProjection(new_sc, new_tr)
+    redraw()
 
   zoom.on 'zoom', ->
     updateProjection(d3.event.scale, d3.event.translate)
@@ -270,13 +325,18 @@ initialize = (db) ->
       pos: [coords.longitude, coords.latitude]
       accuracy: coords.accuracy
     }
-    showLocation()
+    positionUpdate()
 
-  positionErr = ->
+  positionUpdate = ->
+    showLocation()
+    if locationMode == LOCATION_TRACK
+      pos = location.pos
+      if inside(location.pos, db.bbox)
+        centerAt(location.pos)
+
+  positionHide = ->
     location = null
     showLocation()
-
-  navigator.geolocation.watchPosition(positionOk, positionErr)
 
 
 app.load = (url) ->

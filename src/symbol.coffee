@@ -89,3 +89,12 @@ app.symbol.saddle = (selection) ->
   selection.append('text')
       .text(selection.datum().properties.name)
       .attr('x', 6)
+
+
+app.symbol.locationbutton = (selection) ->
+  selection.append('path')
+      .attr('d', "M6,-6 L0,6 L0,0 L-6,0 L6,-6")
+
+  selection.append('circle')
+      .attr('class', 'track')
+      .attr('r', 10)

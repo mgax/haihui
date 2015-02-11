@@ -89,7 +89,32 @@ svg {
 
 .scale {
     path, line {
-      fill: none;
-      stroke: black;
+        fill: none;
+        stroke: black;
+    }
+}
+
+.locationbutton {
+    .buttonmask {
+        fill: none;
+        pointer-events: all;
+    }
+
+    .symbol-locationbutton {
+        path {
+            fill: #888;
+            .locating& {
+                fill: #07f;
+            }
+        }
+
+        .track {
+            fill: none;
+            stroke: none;
+
+            .tracking& {
+                stroke: #07f;
+            }
+        }
     }
 }
