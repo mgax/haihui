@@ -14,6 +14,7 @@ REGION = {
   crai:    {bbox: [25.17, 45.49, 25.29, 45.57], title: "Piatra Craiului"}
   fagaras: {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș"}
   iezer:   {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer"}
+  macin:   {bbox: [28.13, 45.07, 28.42, 45.29], title: "Măcin"}
 }
 
 SLEEPING_PLACE = {
