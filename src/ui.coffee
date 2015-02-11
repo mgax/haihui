@@ -33,9 +33,10 @@ initialize = (db) ->
 
   for route in db.routes
     for id in route.segments
-      segment = segmentMap.get(id)
-      segment.properties.symbols = [] unless segment.properties.symbols?
-      segment.properties.symbols.push(route.symbol)
+      if route.symbol?
+        segment = segmentMap.get(id)
+        segment.properties.symbols = [] unless segment.properties.symbols?
+        segment.properties.symbols.push(route.symbol)
 
   width = 1
   height = 1
@@ -205,6 +206,7 @@ initialize = (db) ->
       .enter().append('g')
         .attr('class', 'symbol segmentSymbol')
         .each (d) ->
+          return unless d.properties.symbols
           for i in d3.range(0, d.properties.symbols.length)
             dx = - d3.round(13 / 2 * (d.properties.symbols.length - 1))
             g = d3.select(@).append('g')
