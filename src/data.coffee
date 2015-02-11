@@ -8,6 +8,7 @@ Q = require('q')
 
 
 REGION = {
+  bucegi:  {bbox: [25.39, 45.34, 25.54, 45.49], title: "Bucegi"}
   ceahlau: {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău"}
   ciucas:  {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș"}
   crai:    {bbox: [25.17, 45.49, 25.29, 45.57], title: "Piatra Craiului"}
