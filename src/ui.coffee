@@ -314,6 +314,7 @@ initialize = (db) ->
     updateSymbols()
     showLocation()
     renderScale()
+    positionDisableTracking()
 
   zoom.on('zoomend', renderSymbols)
   d3.select(window).on('resize', resize)
@@ -333,6 +334,11 @@ initialize = (db) ->
       pos = location.pos
       if inside(location.pos, db.bbox)
         centerAt(location.pos)
+
+  positionDisableTracking = ->
+    if locationMode == LOCATION_TRACK
+      locationMode = LOCATION_SHOW
+      locationbuttong.classed('tracking', false)
 
   positionHide = ->
     location = null
