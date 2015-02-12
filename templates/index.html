@@ -1,17 +1,62 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<style>
+.screenshot { margin: 30px 0; overflow: hidden; }
+.screenshot-image { position: relative; left: 50%; margin-left: -480px; height: 150px; width: 960px; background: url(screenshot.jpg) no-repeat; }
+</style>
 
 <body>
 
-<ul>
-{{#regionList}}
-  <li>
-    <a href="{{slug}}/">{{title}}</a>
-  </li>
-{{/regionList}}
-</ul>
+<div class="container">
+  <h1>haihui</h1>
+
+  <p>O colecție de hărți pentru mers pe munte, optimizate pentru telefonul
+  mobil, construite pe baza datelor din <a
+  href="http://www.openstreetmap.org/">OpenStreetMap</a>. Hărțile conțin trasee
+  marcate, poteci, șosele și râuri, cabane, curbe de nivel și puncte de relief
+  (vârfuri, șei).</p>
+
+  <div class="screenshot"><div class="screenshot-image"></div></div>
+
+  <p>Odată încărcată o hartă, este salvată în telefon, și va funcționa offline.
+  Este posibilă localizarea prin GPS: click o dată pe săgeată pentru
+  localizare, click a doua oară pentru urmărirea locației.</p>
+
+  <h2>Regiuni</h2>
+
+  <ul>
+  {{#regionList}}
+    <li><a href="{{slug}}/">{{title}}</a></li>
+  {{/regionList}}
+  </ul>
+
+  <h2>Cum pot ajuta?</h2>
+
+  <p>În primul rând, folosește hărțile, și dă-ne feedback! Spune-ne dacă
+  aplicația funcționează cu probleme, sau dacă observi date greșite sau lipsă.
+  Baza de date OpenStreetMap este <a
+  href="http://wiki.openstreetmap.org/wiki/Beginners%27_Guide">construită de
+  voluntari</a>, și dacă ne trimiți date colectate prin GPS, putem îmbunătăți
+  harta.</p>
+
+  <h2>Detalii tehnice</h2>
+
+  <p>Pentru fiecare regiune, extragem datele din OpenStreetMap folosind
+  serviciul <a href="http://overpass-api.de">Overpass</a>, le filtrăm și le
+  convertim în format <a
+  href="https://github.com/mbostock/topojson/wiki">TopoJSON</a>. Curbele de
+  nivel provin din <a
+  href="https://en.wikipedia.org/wiki/Shuttle_Radar_Topography_Mission">SRTM</a>.
+  Împachetăm toate datele pentru o regiune într-un fișier JSON, cu mărimea
+  între 150KB (Piatra Craiului) și 950KB (Făgăraș), redus la ~30% după
+  compresie gzip. În browser, salvăm datele în <a
+  href="https://en.wikipedia.org/wiki/Cache_manifest_in_HTML5">appcache</a>, și
+  desenăm harta ca <a
+  href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a>
+  folosind <a href="http://d3js.org">D3.js</a> și multă creativitate. :)</p>
+</div>
 
 <!-- Piwik -->
 <script type="text/javascript">

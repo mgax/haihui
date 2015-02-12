@@ -247,3 +247,4 @@ data.html = ->
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
 
   fs.writeFileSync("build/turfbits.js", fs.readFileSync("turfbits.js"))
+  fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
