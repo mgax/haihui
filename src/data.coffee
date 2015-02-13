@@ -38,16 +38,16 @@ ensureDir = (path) ->
 
 query = (bbox) ->
   filters = [
-    {t: 'relation', k: 'route',    v: 'hiking'}
-    {t: 'node',     k: 'natural',  v: 'saddle'}
-    {t: 'node',     k: 'natural',  v: 'peak'}
-    {t: 'way',      k: 'highway',  v: '', op: '~'}
-    {t: 'way',      k: 'waterway', v: '', op: '~'}
-    {t: 'node',     k: 'tourism',  v: '', op: '~'}
-    {t: 'way',      k: 'tourism',  v: '', op: '~'}
+    'relation["route"="hiking"]'
+    'node["natural"="saddle"]'
+    'node["natural"="peak"]'
+    'way["highway"~""]'
+    'way["waterway"~""]'
+    'node["tourism"~""]'
+    'way["tourism"~""]'
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
-  item = (f) -> "#{f.t}[\"#{f.k}\"#{f.op or '='}\"#{f.v}\"](#{overpassBbox});"
+  item = (f) -> "#{f}(#{overpassBbox});"
   items = (item(f) for f in filters).join('')
   return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
 
