@@ -1,4 +1,5 @@
 <!doctype html>
+<html manifest="./manifest.appcache">
 <meta charset="utf-8">
 <title>Hărți haihui</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -66,8 +67,17 @@
 </div>
 
 <script>
-var c = 'rep.ro', b = 'haihui@g', a = 'mailto:';
-document.getElementById('contact-link').setAttribute('href', a+b+c);
+(function() {
+  var c = 'rep.ro', b = 'haihui@g', a = 'mailto:';
+  document.getElementById('contact-link').setAttribute('href', a+b+c);
+
+  if(window.applicationCache) {
+    applicationCache.addEventListener('updateready', function() {
+      window.applicationCache.swapCache();
+      window.location.reload();
+    });
+  }
+})();
 </script>
 
 <!-- Piwik -->

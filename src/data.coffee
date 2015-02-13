@@ -232,8 +232,9 @@ data.html = ->
     Handlebars.compile(fs.readFileSync("templates/#{name}", encoding: 'utf-8'))
 
   index_html = template('index.html')
+  index_appcache = template('index.appcache')
   region_html = template('region.html')
-  manifest_appcache = template('manifest.appcache')
+  region_appcache = template('region.appcache')
 
   timestamp = (new Date()).toJSON()
   regions = Object.keys(REGION).sort()
@@ -243,11 +244,13 @@ data.html = ->
       "build/#{region}/index.html",
       region_html(title: REGION[region].title)
     )
-    manifest = manifest_appcache(timestamp: timestamp)
-    fs.writeFileSync("build/#{region}/manifest.appcache", manifest)
+    region_manifest = region_appcache(timestamp: timestamp)
+    fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
 
   regionList = ({slug: r, title: REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
+  index_manifest = index_appcache(timestamp: timestamp)
+  fs.writeFileSync("build/manifest.appcache", index_manifest)
 
   fs.writeFileSync("build/turfbits.js", fs.readFileSync("turfbits.js"))
   fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
