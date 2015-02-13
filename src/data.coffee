@@ -239,7 +239,10 @@ data.html = ->
   regions = Object.keys(REGION).sort()
   for region in regions
     ensureDir("build/#{region}")
-    fs.writeFileSync("build/#{region}/index.html", region_html())
+    fs.writeFileSync(
+      "build/#{region}/index.html",
+      region_html(title: REGION[region].title)
+    )
     manifest = manifest_appcache(timestamp: timestamp)
     fs.writeFileSync("build/#{region}/manifest.appcache", manifest)
 
