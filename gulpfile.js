@@ -46,7 +46,10 @@ gulp.task('libs', function() {
     fs.writeFileSync('build/d3.min.js', body);
     request(cdnjs + 'topojson/1.6.9/topojson.min.js', function(err, res, body) {
       fs.writeFileSync('build/topojson.min.js', body);
-      done.resolve();
+      request(cdnjs + 'twitter-bootstrap/3.3.2/css/bootstrap.min.css', function(err, res, body) {
+        fs.writeFileSync('build/bootstrap.min.css', body);
+        done.resolve();
+      });
     });
   });
   return done.promise;
