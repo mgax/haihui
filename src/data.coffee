@@ -41,6 +41,7 @@ query = (bbox) ->
     'relation["route"="hiking"]'
     'node["natural"="saddle"]'
     'node["natural"="peak"]'
+    'node["amenity"="shelter"]["shelter_type"="basic_hut"]'
     'way["highway"~""]'
     'way["waterway"~""]'
     'node["tourism"~""]'
@@ -126,6 +127,15 @@ compileOsm = (bbox, osm, dem) ->
     }
     return f
 
+  shelter = (obj) ->
+    f = turf.point([obj.lon, obj.lat])
+    f.id = obj.id
+    f.properties = {
+      name: obj.tags.name
+      type: 'basic_hut'
+    }
+    return f
+
   highway = (obj) ->
     f = turf.linestring(pos(n) for n in obj.nodes)
     grade = switch obj.tags.highway
@@ -171,6 +181,9 @@ compileOsm = (bbox, osm, dem) ->
     if SLEEPING_PLACE[o.tags.tourism]
       if o.type == 'node' or o.type == 'way'
         poi.push(tourism(o))
+
+    if o.type == 'node' and o.tags.amenity == 'shelter' and o.tags.shelter_type == 'basic_hut'
+      poi.push(shelter(o))
 
     if o.type == 'way' and o.tags.highway?
       r = highway(o)

@@ -71,6 +71,17 @@ app.symbol.chalet = app.symbol.alpine_hut
 app.symbol.hotel = app.symbol.alpine_hut
 
 
+app.symbol.basic_hut = (selection) ->
+  selection.append('path')
+      .attr('class', 'symbol-basic_hut')
+      .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
+
+  selection.append('text')
+      .text(selection.datum().properties.name)
+      .attr('x', 10)
+      .attr('y', -2)
+
+
 app.symbol.peak = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-peak')
