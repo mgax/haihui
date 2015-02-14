@@ -20,6 +20,8 @@ inside = (pos, bbox) ->
 
 
 initialize = (db) ->
+  dispatch = d3.dispatch('zoom', 'zoomend')
+
   topojson.presimplify(db.topo)
   topojson.presimplify(db.dem)
 
@@ -312,13 +314,20 @@ initialize = (db) ->
 
   zoom.on 'zoom', ->
     updateProjection(d3.event.scale, d3.event.translate)
-    render()
-    updateSymbols()
+    dispatch.zoom()
+
+  zoom.on 'zoomend', ->
+    dispatch.zoomend()
+
+  dispatch.on('zoom.render', render)
+  dispatch.on('zoom.symbols', updateSymbols)
+  dispatch.on('zoom.scale', renderScale)
+  dispatch.on 'zoom.location', ->
     showLocation()
-    renderScale()
     positionDisableTracking()
 
-  zoom.on('zoomend', renderSymbols)
+  dispatch.on('zoomend.symbols', renderSymbols)
+
   d3.select(window).on('resize', resize)
   resize()
 
