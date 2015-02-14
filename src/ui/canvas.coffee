@@ -34,7 +34,7 @@ app.canvas = (options) ->
   clip = d3.geo.clipExtent()
 
   map.path = d3.geo.path()
-      .projection(stream: (s) -> simplify.stream(projection.stream(clip.stream(s))))
+      .projection(stream: (s) -> simplify.stream(clip.stream(projection.stream(s))))
 
   svg = d3.select('body').append('svg')
 
@@ -53,8 +53,6 @@ app.canvas = (options) ->
   resize = ->
     map.width = parseInt(d3.select('body').style('width'))
     map.height = parseInt(d3.select('body').style('height'))
-
-    clip.extent([[0, 0], [map.width, map.height]])
 
     projection.scale(map.s0 = d3.min([map.width / boxWidth, map.height / boxHeight]))
     f0 = (bbox[2] - bbox[0]) / boxWidth / map.s0
@@ -79,6 +77,7 @@ app.canvas = (options) ->
     projection
         .scale(map.s0 * map.sc)
         .translate([t0[0] * map.sc + tr[0], t0[1] * map.sc + tr[1]])
+    clip.extent([projection.invert([0, map.height]), projection.invert([map.width, 0])])
 
   map.centerAt = (pos) ->
     new_sc = 8000000 / map.s0
