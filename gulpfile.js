@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     coffee = require('gulp-coffee'),
     less = require('gulp-less'),
     sourcemaps = require('gulp-sourcemaps'),
+    concat = require('gulp-concat'),
     Q = require('q'),
     http = require('http'),
     express = require('express');
@@ -60,6 +61,7 @@ gulp.task('ui', function() {
   gulp.src(['./src/symbol.coffee', './src/ui.coffee'])
     .pipe(sourcemaps.init())
     .pipe(coffee())
+    .pipe(concat('ui.js'))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 
