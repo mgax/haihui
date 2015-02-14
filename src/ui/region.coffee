@@ -1,8 +1,6 @@
 app.PXKM = 6250  # convert pixels to kilometers
 app.DEGM = 20000000 / 180 # convert degrees to meters
 ACTIONBAR_HEIGHT = 30
-siFormat = d3.format('s')
-distanceFormat = (d) -> if d == 0 then '0' else "#{siFormat(d)}m"
 
 
 index = (objects) ->
@@ -113,6 +111,11 @@ initialize = (db) ->
     contours: contours
   )
 
+  app.scale(
+    map: map
+    scaleg: scaleg
+  )
+
   segments.selectAll('.segment')
       .data(segmentLayer)
     .enter().append('path')
@@ -183,21 +186,6 @@ initialize = (db) ->
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
 
-  renderScale = ->
-    deg_150px = (projection.invert([150, 0])[0] - projection.invert([0, 0])[0])
-    mapscale = d3.scale.linear()
-     .domain([0, deg_150px * app.DEGM])
-     .rangeRound([0, 150])
-
-    scaleg.selectAll().remove()
-    axis = d3.svg.axis()
-        .scale(mapscale)
-        .orient('bottom')
-        .ticks(2)
-        .tickSize(6, 0)
-        .tickFormat(distanceFormat)
-    scaleg.call(axis)
-
   resize = ->
     width = parseInt(d3.select('body').style('width'))
     height = parseInt(d3.select('body').style('height'))
@@ -224,7 +212,6 @@ initialize = (db) ->
   map.dispatch.on 'redraw.generic', ->
     render()
     renderSymbols()
-    renderScale()
 
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
@@ -251,7 +238,6 @@ initialize = (db) ->
 
   map.dispatch.on('zoom.render', render)
   map.dispatch.on('zoom.symbols', updateSymbols)
-  map.dispatch.on('zoom.scale', renderScale)
   map.dispatch.on('zoomend.symbols', renderSymbols)
 
   d3.select(window).on('resize', resize)
