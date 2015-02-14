@@ -1,9 +1,6 @@
 PXKM = 6250  # convert pixels to kilometers
-DEGM = 20000000 / 180 # convert degrees to meters
+app.DEGM = 20000000 / 180 # convert degrees to meters
 ACTIONBAR_HEIGHT = 30
-LOCATION_OFF = 0
-LOCATION_SHOW = 1
-LOCATION_TRACK = 2
 siFormat = d3.format('s')
 distanceFormat = (d) -> if d == 0 then '0' else "#{siFormat(d)}m"
 
@@ -15,12 +12,15 @@ index = (objects) ->
   return map
 
 
-inside = (pos, bbox) ->
+app.inside = (pos, bbox) ->
   bbox[0] <= pos[0] and pos[0] < bbox[2] and bbox[1] <= pos[1] and pos[1] < bbox[3]
 
 
 initialize = (db) ->
-  dispatch = d3.dispatch('zoom', 'zoomend')
+  map = {
+    db: db
+    dispatch: d3.dispatch('zoom', 'zoomend', 'redraw')
+  }
 
   topojson.presimplify(db.topo)
   topojson.presimplify(db.dem)
@@ -48,11 +48,8 @@ initialize = (db) ->
   t0 = [0, 0]
   tr = [0, 0]
   f0 = 1
-  location = null
-  locationMode = LOCATION_OFF
-  locationWatch = null
 
-  projection = d3.geo.albers()
+  projection = map.projection = d3.geo.albers()
       .center([0, center[1]])
       .rotate([-center[0], 0])
       .parallels([center[1] - 5, center[1] + 5])
@@ -87,13 +84,6 @@ initialize = (db) ->
   symbols = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
 
-  locationg.append('circle')
-      .attr('class', 'midpoint')
-      .attr('r', 2)
-
-  locationg.append('circle')
-      .attr('class', 'accuracy')
-
   svg.append('rect')
       .attr('class', 'zoomrect')
       .call(zoom)
@@ -113,35 +103,11 @@ initialize = (db) ->
       .attr('class', 'locationbutton')
       .attr('transform', "translate(200, #{ACTIONBAR_HEIGHT / 2})")
 
-  locationbuttong.append('g')
-      .attr('class', 'symbol-locationbutton')
-
-  locationbuttong.append('rect')
-      .attr('class', 'buttonmask')
-      .attr('x', -15)
-      .attr('y', -15)
-      .attr('width', 30)
-      .attr('height', 30)
-      .on 'click', ->
-        switch locationMode
-          when LOCATION_OFF
-            locationMode = LOCATION_SHOW
-            locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide)
-            locationbuttong.classed('locating', true)
-
-          when LOCATION_SHOW
-            locationMode = LOCATION_TRACK
-            locationbuttong.classed('tracking', true)
-            positionUpdate()
-
-          when LOCATION_TRACK
-            locationMode = LOCATION_OFF
-            locationbuttong.classed('tracking', false)
-            locationbuttong.classed('locating', false)
-            navigator.geolocation.clearWatch(locationWatch)
-            positionHide()
-
-  app.symbol.locationbutton(locationbuttong.select('.symbol-locationbutton'))
+  app.location(
+    map: map
+    locationg: locationg
+    locationbuttong: locationbuttong
+  )
 
   segments.selectAll('.segment')
       .data(segmentLayer)
@@ -235,27 +201,10 @@ initialize = (db) ->
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
 
-  showLocation = () ->
-    g = svg.select('.location')
-
-    unless location?
-      g.style('display', 'none')
-      return
-
-    xy = projection(location.pos)
-    ra = location.accuracy / DEGM
-    xya = projection([location.pos[0], location.pos[1] + ra])
-
-    g.style('display', null)
-        .attr('transform', "translate(#{xy})")
-
-    g.select('.accuracy')
-        .attr('r', xy[1] - xya[1])
-
   renderScale = ->
     deg_150px = (projection.invert([150, 0])[0] - projection.invert([0, 0])[0])
     mapscale = d3.scale.linear()
-     .domain([0, deg_150px * DEGM])
+     .domain([0, deg_150px * app.DEGM])
      .rangeRound([0, 150])
 
     scaleg.selectAll().remove()
@@ -288,12 +237,11 @@ initialize = (db) ->
     actionbar.attr('transform', "translate(0, #{height - ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', width)
 
-    redraw()
+    map.dispatch.redraw()
 
-  redraw = ->
+  map.dispatch.on 'redraw.generic', ->
     render()
     renderSymbols()
-    showLocation()
     renderScale()
 
   updateProjection = (new_sc, new_tr) ->
@@ -303,57 +251,29 @@ initialize = (db) ->
         .scale(s0 * sc)
         .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
 
-  centerAt = (pos) ->
+  map.centerAt = (pos) ->
     new_sc = 8000000 / s0
     updateProjection(new_sc, [0, 0])
     xy = projection(pos)
     new_tr = [width / 2 - xy[0], height / 2 - xy[1]]
     zoom.scale(new_sc).translate(new_tr)
     updateProjection(new_sc, new_tr)
-    redraw()
+    map.dispatch.redraw()
 
   zoom.on 'zoom', ->
     updateProjection(d3.event.scale, d3.event.translate)
-    dispatch.zoom()
+    map.dispatch.zoom()
 
   zoom.on 'zoomend', ->
-    dispatch.zoomend()
+    map.dispatch.zoomend()
 
-  dispatch.on('zoom.render', render)
-  dispatch.on('zoom.symbols', updateSymbols)
-  dispatch.on('zoom.scale', renderScale)
-  dispatch.on 'zoom.location', ->
-    showLocation()
-    positionDisableTracking()
-
-  dispatch.on('zoomend.symbols', renderSymbols)
+  map.dispatch.on('zoom.render', render)
+  map.dispatch.on('zoom.symbols', updateSymbols)
+  map.dispatch.on('zoom.scale', renderScale)
+  map.dispatch.on('zoomend.symbols', renderSymbols)
 
   d3.select(window).on('resize', resize)
   resize()
-
-  positionOk = (evt) ->
-    coords = evt.coords
-    location = {
-      pos: [coords.longitude, coords.latitude]
-      accuracy: coords.accuracy
-    }
-    positionUpdate()
-
-  positionUpdate = ->
-    showLocation()
-    if locationMode == LOCATION_TRACK
-      pos = location.pos
-      if inside(location.pos, db.bbox)
-        centerAt(location.pos)
-
-  positionDisableTracking = ->
-    if locationMode == LOCATION_TRACK
-      locationMode = LOCATION_SHOW
-      locationbuttong.classed('tracking', false)
-
-  positionHide = ->
-    location = null
-    showLocation()
 
 
 app.load = (url) ->
