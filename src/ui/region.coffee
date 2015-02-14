@@ -3,7 +3,7 @@ app.DEGM = 20000000 / 180 # convert degrees to meters
 ACTIONBAR_HEIGHT = 30
 
 
-index = (objects) ->
+app.index = (objects) ->
   map = d3.map()
   for o in objects
     map.set(o.id, o)
@@ -23,22 +23,8 @@ initialize = (db) ->
   topojson.presimplify(db.topo)
   topojson.presimplify(db.dem)
 
-  segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
-  segmentMap = index(segmentLayer)
-
-  poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
-  riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
-  highwaysLayer = topojson.feature(db.topo, db.topo.objects.highways).features
-
-  for route in db.routes
-    for id in route.segments
-      if route.symbol?
-        segment = segmentMap.get(id)
-        segment.properties.symbols = [] unless segment.properties.symbols?
-        segment.properties.symbols.push(route.symbol)
-
-  width = 1
-  height = 1
+  map.width = 1
+  map.height = 1
   center = [(db.bbox[0] + db.bbox[2]) / 2, (db.bbox[1] + db.bbox[3]) / 2]
   map.s0 = 1
   map.sc = 1
@@ -75,10 +61,7 @@ initialize = (db) ->
   svg = d3.select('body').append('svg')
 
   contours = svg.append('g')
-  rivers = svg.append('g')
-  highways = svg.append('g')
-  segments = svg.append('g')
-  symbols = svg.append('g')
+  features = svg.append('g')
   locationg = svg.append('g').attr('class', 'location')
 
   svg.append('rect')
@@ -116,102 +99,33 @@ initialize = (db) ->
     scaleg: scaleg
   )
 
-  segments.selectAll('.segment')
-      .data(segmentLayer)
-    .enter().append('path')
-      .attr('class', 'segment')
-
-  rivers.selectAll('.river')
-      .data(riversLayer)
-    .enter().append('path')
-      .attr('class', 'river')
-
-  highways.selectAll('.highway')
-      .data(highwaysLayer)
-    .enter().append('path')
-      .attr('class', (d) -> "highway highway-#{d.properties.grade}")
-
-  render = ->
-    segments.selectAll('.segment')
-        .attr('d', path)
-
-    rivers.selectAll('.river')
-        .attr('d', path)
-
-    highways.selectAll('.highway')
-        .attr('d', path)
-
-  renderSymbols = ->
-    symbols.selectAll('.symbol').remove()
-
-    interval = 80 * app.PXKM / (map.s0 * map.sc)
-    segmentSymbols = []
-    for segment in segmentLayer
-      length = turf.lineDistance(segment, 'kilometers')
-      for n in d3.range(0, d3.round(length / interval))
-        point = turf.along(segment, interval * (n + 0.5), 'kilometers')
-        point.properties = {symbols: segment.properties.symbols}
-        [x, y] = projection(point.geometry.coordinates)
-        if x > 0 and x < width and y > 0 and y < height
-          segmentSymbols.push(point)
-
-    symbols.selectAll('.segmentSymbol').data(segmentSymbols)
-      .enter().append('g')
-        .attr('class', 'symbol segmentSymbol')
-        .each (d) ->
-          return unless d.properties.symbols
-          for i in d3.range(0, d.properties.symbols.length)
-            dx = - d3.round(13 / 2 * (d.properties.symbols.length - 1))
-            g = d3.select(@).append('g')
-                .attr('transform', "translate(#{i * 13 + dx},0)")
-            app.symbol.osmc(d.properties.symbols[i])(g)
-
-    poiSymbols = []
-    for poi in poiLayer
-      [x, y] = projection(poi.geometry.coordinates)
-      if x > 0 and x < width and y > 0 and y < height
-        poiSymbols.push(poi)
-
-    symbols.selectAll('.poiSymbol').data(poiSymbols)
-      .enter().append('g')
-        .attr('class', 'symbol poiSymbol')
-        .each (poi) ->
-          if (drawSymbol = app.symbol[poi.properties.type])?
-            drawSymbol(d3.select(@))
-
-    updateSymbols()
-
-  updateSymbols = ->
-    symbols.selectAll('.symbol')
-        .attr 'transform', (d) ->
-          "translate(#{d3.round(d) for d in projection(d.geometry.coordinates)})"
+  app.features(
+    map: map
+    g: features
+  )
 
   resize = ->
-    width = parseInt(d3.select('body').style('width'))
-    height = parseInt(d3.select('body').style('height'))
+    map.width = parseInt(d3.select('body').style('width'))
+    map.height = parseInt(d3.select('body').style('height'))
 
-    clip.extent([[0, 0], [width, height]])
+    clip.extent([[0, 0], [map.width, map.height]])
 
-    projection.scale(map.s0 = d3.min([width / boxWidth, height / boxHeight]))
+    projection.scale(map.s0 = d3.min([map.width / boxWidth, map.height / boxHeight]))
     f0 = (db.bbox[2] - db.bbox[0]) / boxWidth / map.s0
 
     svg.select('.zoomrect')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', map.width)
+        .attr('height', map.height)
 
-    projection.translate(t0 = [width / 2, height / 2])
+    projection.translate(t0 = [map.width / 2, map.height / 2])
 
     zoom.scale(1).translate([0, 0])
     updateProjection(1, [0, 0])
 
-    actionbar.attr('transform', "translate(0, #{height - ACTIONBAR_HEIGHT})")
-    actionbar.select('.background').attr('width', width)
+    actionbar.attr('transform', "translate(0, #{map.height - ACTIONBAR_HEIGHT})")
+    actionbar.select('.background').attr('width', map.width)
 
     map.dispatch.redraw()
-
-  map.dispatch.on 'redraw.generic', ->
-    render()
-    renderSymbols()
 
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
@@ -224,7 +138,7 @@ initialize = (db) ->
     new_sc = 8000000 / map.s0
     updateProjection(new_sc, [0, 0])
     xy = projection(pos)
-    new_tr = [width / 2 - xy[0], height / 2 - xy[1]]
+    new_tr = [map.width / 2 - xy[0], map.height / 2 - xy[1]]
     zoom.scale(new_sc).translate(new_tr)
     updateProjection(new_sc, new_tr)
     map.dispatch.redraw()
@@ -235,10 +149,6 @@ initialize = (db) ->
 
   zoom.on 'zoomend', ->
     map.dispatch.zoomend()
-
-  map.dispatch.on('zoom.render', render)
-  map.dispatch.on('zoom.symbols', updateSymbols)
-  map.dispatch.on('zoomend.symbols', renderSymbols)
 
   d3.select(window).on('resize', resize)
   resize()
