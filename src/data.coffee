@@ -6,8 +6,10 @@ topojson = require('topojson')
 turf = require('turf')
 Q = require('q')
 
+data = module.exports = {}
 
-REGION = {
+
+data.REGION = {
   bucegi:  {bbox: [25.39, 45.34, 25.54, 45.49], title: "Bucegi"}
   ceahlau: {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău"}
   ciucas:  {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș"}
@@ -54,17 +56,6 @@ query = (bbox) ->
   return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
 
 
-data = module.exports = {}
-
-data.buildAll = ->
-  def = Q()
-
-  Object.keys(REGION).sort().forEach (region) ->
-    def = def.then ->
-      data.build(region)
-
-  return def
-
 data.build = (region) ->
   console.log("building", region)
   deferred = Q.defer()
@@ -72,7 +63,7 @@ data.build = (region) ->
   data.dem(region)
 
   .then ->
-    bbox = REGION[region].bbox
+    bbox = data.REGION[region].bbox
     q = query(bbox)
     url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
@@ -213,7 +204,7 @@ compileOsm = (bbox, osm, dem) ->
 
 data.dem = (region) ->
   demDone = Q.defer()
-  bbox = REGION[region].bbox
+  bbox = data.REGION[region].bbox
 
   exec("rm -f data/contours/#{region}.*")
   .then ->
@@ -251,17 +242,17 @@ data.html = ->
   region_appcache = template('region.appcache')
 
   timestamp = (new Date()).toJSON()
-  regions = Object.keys(REGION).sort()
+  regions = Object.keys(data.REGION).sort()
   for region in regions
     ensureDir("build/#{region}")
     fs.writeFileSync(
       "build/#{region}/index.html",
-      region_html(title: REGION[region].title)
+      region_html(title: data.REGION[region].title)
     )
     region_manifest = region_appcache(timestamp: timestamp)
     fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
 
-  regionList = ({slug: r, title: REGION[r].title} for r in regions)
+  regionList = ({slug: r, title: data.REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
   index_manifest = index_appcache(timestamp: timestamp)
   fs.writeFileSync("build/manifest.appcache", index_manifest)

@@ -1,3 +1,5 @@
+require('coffee-script/register');
+
 var gulp = require('gulp'),
     coffee = require('gulp-coffee'),
     less = require('gulp-less'),
@@ -5,7 +7,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     Q = require('q'),
     http = require('http'),
-    express = require('express');
+    express = require('express'),
+    data = require('./src/data.coffee');
 
 
 gulp.task('serve', function() {
@@ -20,21 +23,20 @@ gulp.task('serve', function() {
 });
 
 
-gulp.task('ciucas', function() {
-  require('coffee-script/register');
-  return require('./src/data.coffee').build('ciucas');
+var regionList = Object.keys(data.REGION).sort();
+
+regionList.forEach(function(region) {
+  gulp.task('data-' + region, function() {
+    return data.build(region);
+  });
 });
 
 
-gulp.task('data', function() {
-  require('coffee-script/register');
-  return require('./src/data.coffee').buildAll();
-});
+gulp.task('data', regionList.map(function(region) { return 'data-' + region }));
 
 
 gulp.task('html', function() {
-  require('coffee-script/register');
-  return require('./src/data.coffee').html();
+  return data.html();
 });
 
 
