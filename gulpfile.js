@@ -22,19 +22,19 @@ gulp.task('serve', function() {
 
 gulp.task('ciucas', function() {
   require('coffee-script/register');
-  return require('./data.coffee').build('ciucas');
+  return require('./src/data.coffee').build('ciucas');
 });
 
 
 gulp.task('data', function() {
   require('coffee-script/register');
-  return require('./data.coffee').buildAll();
+  return require('./src/data.coffee').buildAll();
 });
 
 
 gulp.task('html', function() {
   require('coffee-script/register');
-  return require('./data.coffee').html();
+  return require('./src/data.coffee').html();
 });
 
 
@@ -58,14 +58,14 @@ gulp.task('libs', function() {
 
 
 gulp.task('ui', function() {
-  gulp.src(['./src/symbol.coffee', './src/ui.coffee'])
+  gulp.src('src/ui/**/*.coffee')
     .pipe(sourcemaps.init())
     .pipe(coffee())
     .pipe(concat('ui.js'))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
 
-  gulp.src('src/ui.less')
+  gulp.src('src/ui/region.less')
     .pipe(less())
     .pipe(gulp.dest('./build'))
 });
@@ -73,7 +73,7 @@ gulp.task('ui', function() {
 
 gulp.task('auto', function() {
   gulp.start('ui');
-  gulp.watch('src/**/*', ['ui']);
+  gulp.watch('src/ui/**/*', ['ui']);
 });
 
 
