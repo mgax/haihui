@@ -57,25 +57,34 @@ gulp.task('libs', function() {
 });
 
 
-gulp.task('ui', function() {
-  gulp.src('src/ui/**/*.coffee')
+gulp.task('js', function() {
+  return gulp.src('src/ui/**/*.coffee')
     .pipe(sourcemaps.init())
     .pipe(coffee())
     .pipe(concat('ui.js'))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./build'));
+});
 
-  gulp.src('src/ui/region.less')
+
+gulp.task('css', function() {
+  return gulp.src('src/ui/region.less')
     .pipe(less())
     .pipe(gulp.dest('./build'))
+});
+
+
+gulp.task('ui', ['js', 'css'], function() {
+  gulp.start('html');
 });
 
 
 gulp.task('auto', function() {
   gulp.start('ui');
   gulp.watch('src/ui/**/*', ['ui']);
+  gulp.watch('templates/**/*', ['ui']);
 });
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui', 'html', 'libs']);
+gulp.task('default', ['data', 'ui', 'libs']);
