@@ -15,6 +15,7 @@ REGION = {
   fagaras: {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș"}
   iezer:   {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer"}
   macin:   {bbox: [28.13, 45.07, 28.42, 45.29], title: "Măcin"}
+  parang:  {bbox: [23.43, 45.31, 23.82, 45.41], title: "Parâng"}
   retezat: {bbox: [22.72, 45.29, 23.00, 45.42], title: "Retezat"}
 }
 
