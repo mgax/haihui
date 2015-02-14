@@ -22,19 +22,19 @@ gulp.task('serve', function() {
 
 gulp.task('ciucas', function() {
   require('coffee-script/register');
-  return require('./src/data.coffee').build('ciucas');
+  return require('./data.coffee').build('ciucas');
 });
 
 
 gulp.task('data', function() {
   require('coffee-script/register');
-  return require('./src/data.coffee').buildAll();
+  return require('./data.coffee').buildAll();
 });
 
 
 gulp.task('html', function() {
   require('coffee-script/register');
-  return require('./src/data.coffee').html();
+  return require('./data.coffee').html();
 });
 
 
