@@ -1,4 +1,4 @@
-PXKM = 6250  # convert pixels to kilometers
+app.PXKM = 6250  # convert pixels to kilometers
 app.DEGM = 20000000 / 180 # convert degrees to meters
 ACTIONBAR_HEIGHT = 30
 siFormat = d3.format('s')
@@ -31,7 +31,6 @@ initialize = (db) ->
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
   riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
   highwaysLayer = topojson.feature(db.topo, db.topo.objects.highways).features
-  contourLayer = topojson.feature(db.dem, db.dem.objects.contour).features
 
   for route in db.routes
     for id in route.segments
@@ -43,8 +42,8 @@ initialize = (db) ->
   width = 1
   height = 1
   center = [(db.bbox[0] + db.bbox[2]) / 2, (db.bbox[1] + db.bbox[3]) / 2]
-  s0 = 1
-  sc = 1
+  map.s0 = 1
+  map.sc = 1
   t0 = [0, 0]
   tr = [0, 0]
   f0 = 1
@@ -65,14 +64,14 @@ initialize = (db) ->
 
   simplify = d3.geo.transform(
     point: (x, y, z) ->
-      if z? and z >= f0 / sc / 300
+      if z? and z >= f0 / map.sc / 300
         [a, b] = projection([x, y])
         return @stream.point(a, b)
   )
 
   clip = d3.geo.clipExtent()
 
-  path = d3.geo.path()
+  path = map.path = d3.geo.path()
       .projection(stream: (s) -> simplify.stream(clip.stream(s)))
 
   svg = d3.select('body').append('svg')
@@ -109,17 +108,15 @@ initialize = (db) ->
     locationbuttong: locationbuttong
   )
 
+  app.dem(
+    map: map
+    contours: contours
+  )
+
   segments.selectAll('.segment')
       .data(segmentLayer)
     .enter().append('path')
       .attr('class', 'segment')
-
-  contours.selectAll('.contour')
-      .data(contourLayer)
-    .enter().append('path')
-      .attr('class', 'contour')
-      .classed('contour-minor', (d) -> d.properties.elevation % 300)
-      .attr('id', (d) -> "contour-#{d.id}")
 
   rivers.selectAll('.river')
       .data(riversLayer)
@@ -141,25 +138,10 @@ initialize = (db) ->
     highways.selectAll('.highway')
         .attr('d', path)
 
-    contours.selectAll('.contour')
-        .attr('d', path)
-
-    contours.selectAll('.contour-label').remove()
-
-    for ring in contourLayer
-      continue if ring.properties.elevation % 300
-      length = turf.lineDistance(ring, 'kilometers') * (s0 * sc) / PXKM
-      contours.append('text')
-          .attr('class', 'contour-label')
-          .append('textPath')
-            .attr('xlink:href', "#contour-#{ring.id}")
-            .attr('startOffset', "50%")
-            .text(ring.properties.elevation)
-
   renderSymbols = ->
     symbols.selectAll('.symbol').remove()
 
-    interval = 80 * PXKM / (s0 * sc)
+    interval = 80 * app.PXKM / (map.s0 * map.sc)
     segmentSymbols = []
     for segment in segmentLayer
       length = turf.lineDistance(segment, 'kilometers')
@@ -222,8 +204,8 @@ initialize = (db) ->
 
     clip.extent([[0, 0], [width, height]])
 
-    projection.scale(s0 = d3.min([width / boxWidth, height / boxHeight]))
-    f0 = (db.bbox[2] - db.bbox[0]) / boxWidth / s0
+    projection.scale(map.s0 = d3.min([width / boxWidth, height / boxHeight]))
+    f0 = (db.bbox[2] - db.bbox[0]) / boxWidth / map.s0
 
     svg.select('.zoomrect')
         .attr('width', width)
@@ -245,14 +227,14 @@ initialize = (db) ->
     renderScale()
 
   updateProjection = (new_sc, new_tr) ->
-    sc = new_sc
+    map.sc = new_sc
     tr = new_tr
     projection
-        .scale(s0 * sc)
-        .translate([t0[0] * sc + tr[0], t0[1] * sc + tr[1]])
+        .scale(map.s0 * map.sc)
+        .translate([t0[0] * map.sc + tr[0], t0[1] * map.sc + tr[1]])
 
   map.centerAt = (pos) ->
-    new_sc = 8000000 / s0
+    new_sc = 8000000 / map.s0
     updateProjection(new_sc, [0, 0])
     xy = projection(pos)
     new_tr = [width / 2 - xy[0], height / 2 - xy[1]]
