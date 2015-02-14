@@ -28,14 +28,13 @@ app.canvas = (options) ->
   simplify = d3.geo.transform(
     point: (x, y, z) ->
       if z? and z >= f0 / map.sc / 300
-        [a, b] = projection([x, y])
-        return @stream.point(a, b)
+        return @stream.point(x, y)
   )
 
   clip = d3.geo.clipExtent()
 
   map.path = d3.geo.path()
-      .projection(stream: (s) -> simplify.stream(clip.stream(s)))
+      .projection(stream: (s) -> simplify.stream(projection.stream(clip.stream(s))))
 
   svg = d3.select('body').append('svg')
 
