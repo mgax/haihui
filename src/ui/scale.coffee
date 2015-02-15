@@ -9,7 +9,7 @@ app.scale = (options) ->
   renderScale = ->
     deg_150px = (map.projection.invert([150, 0])[0] - map.projection.invert([0, 0])[0])
     mapscale = d3.scale.linear()
-     .domain([0, deg_150px * app.DEGM])
+     .domain([0, deg_150px])
      .rangeRound([0, 150])
 
     scaleg.selectAll().remove()
