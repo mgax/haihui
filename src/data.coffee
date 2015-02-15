@@ -62,14 +62,13 @@ data.build = (region) ->
 
   data.dem(region)
 
-  .then ->
+  .then (dem) ->
     bbox = data.REGION[region].bbox
     q = query(bbox)
     url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
 
     request url, (err, res, body) ->
-      dem = JSON.parse(fs.readFileSync("data/contours/#{region}.topojson"))
       p = JSON.parse(body)
       db = compileOsm(bbox, p, dem)
       ensureDir("build/#{region}")
@@ -203,32 +202,43 @@ compileOsm = (bbox, osm, dem) ->
 
 
 data.dem = (region) ->
-  demDone = Q.defer()
   bbox = data.REGION[region].bbox
+  demPath = "data/contours/#{region}.topojson"
 
-  exec("rm -f data/contours/#{region}.*")
-  .then ->
-    exec("gdalwarp
-          data/srtm-1arcsec-ro.tiff
-          data/contours/#{region}.tiff
-          -te #{bbox.join(' ')}")
-  .then ->
-    exec("gdal_contour
-          data/contours/#{region}.tiff
-          data/contours/#{region}.shp
-          -a elevation
-          -i 100")
-  .then ->
-    exec("topojson
-          contour=data/contours/#{region}.shp
-          -o data/contours/#{region}.topojson
-          --id-property ID
-          -p elevation
-          -s .00000000001")
-  .done ->
-    demDone.resolve()
+  buildDem = ->
+    demDone = Q.defer()
+    exec("rm -f data/contours/#{region}.*")
+    .then ->
+      exec("gdalwarp
+            data/srtm-1arcsec-ro.tiff
+            data/contours/#{region}.tiff
+            -te #{bbox.join(' ')}")
+    .then ->
+      exec("gdal_contour
+            data/contours/#{region}.tiff
+            data/contours/#{region}.shp
+            -a elevation
+            -i 100")
+    .then ->
+      exec("topojson
+            contour=data/contours/#{region}.shp
+            -o #{demPath}
+            --id-property ID
+            -p elevation
+            -s .00000000001")
+    .done ->
+      dem = JSON.parse(fs.readFileSync(demPath))
+      demDone.resolve(dem)
 
-  return demDone.promise
+    return demDone.promise
+
+  if fs.existsSync(demPath)
+    dem = JSON.parse(fs.readFileSync(demPath))
+    if JSON.stringify(bbox) == JSON.stringify(dem.objects.contour.bbox)
+      console.log "using cached dem topojson"
+      return Q(dem)
+
+  return buildDem()
 
 
 data.html = ->
