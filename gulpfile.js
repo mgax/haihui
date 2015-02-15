@@ -29,6 +29,10 @@ regionList.forEach(function(region) {
   gulp.task('data-' + region, function() {
     return data.build(region);
   });
+
+  gulp.task('err-' + region, function() {
+    return data.err(region);
+  });
 });
 
 
