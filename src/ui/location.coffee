@@ -1,3 +1,4 @@
+ACCURACY_LIMIT = 1000  # 1km
 LOCATION_OFF = 0
 LOCATION_SHOW = 1
 LOCATION_TRACK = 2
@@ -53,15 +54,12 @@ app.location = (options) ->
       locationg.style('display', 'none')
       return
 
-    xy = map.projection(location.pos)
-    ra = location.accuracy / app.DEGM
-    xya = map.projection([location.pos[0], location.pos[1] + ra])
-
+    xy = map.projection(map.wgsProjection(location.pos))
     locationg.style('display', null)
         .attr('transform', "translate(#{xy})")
 
     locationg.select('.accuracy')
-        .attr('r', xy[1] - xya[1])
+        .attr('r', location.accuracy * map.sc)
 
   map.dispatch.on 'zoom.location', ->
     showLocation()
@@ -72,6 +70,7 @@ app.location = (options) ->
 
   positionOk = (evt) ->
     coords = evt.coords
+    return if coords.accuracy > ACCURACY_LIMIT
     location = {
       pos: [coords.longitude, coords.latitude]
       accuracy: coords.accuracy
@@ -81,9 +80,11 @@ app.location = (options) ->
   positionUpdate = ->
     showLocation()
     if locationMode == LOCATION_TRACK and location
-      pos = location.pos
-      if app.inside(location.pos, map.db.bbox)
-        map.centerAt(location.pos)
+      point = map.wgsProjection(location.pos)
+      if app.inside(point, map.db.bbox)
+        scaleTarget = d3.min([map.width, map.height]) / 3 / location.accuracy
+        scale = d3.min([scaleTarget, 3])
+        map.centerAt(point, scale)
 
   positionDisableTracking = ->
     if locationMode == LOCATION_TRACK

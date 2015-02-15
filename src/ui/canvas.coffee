@@ -83,7 +83,7 @@ app.canvas = (options) ->
     map.tr = new_tr
     clip.extent([projection.invert([0, map.height]), projection.invert([map.width, 0])])
 
-  map.centerAt = (pos, new_sc=8000000) ->
+  map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
     xy = projection(pos)
     new_tr = [map.width / 2 - xy[0], map.height / 2 - xy[1]]
