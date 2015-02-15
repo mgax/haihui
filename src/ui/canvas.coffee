@@ -2,11 +2,6 @@ app.canvas = (options) ->
   map = options.map
   bbox = map.db.bbox
 
-  map.width = 1
-  map.height = 1
-  map.sc = 1
-  map.tr = [0, 0]
-
   extent = {
     w: d3.max([-bbox[0], bbox[2]]) * 2
     h: d3.max([-bbox[1], bbox[3]]) * 2
@@ -63,16 +58,30 @@ app.canvas = (options) ->
       .attr('class', 'actionbar')
 
   resize = ->
+    if map.sc?
+      oldCenter = [map.width / 2, map.height / 2]
+
     map.width = parseInt(d3.select('body').style('width'))
     map.height = parseInt(d3.select('body').style('height'))
+    minScale = d3.min([map.width / extent.w, map.height / extent.h])
+
+    if map.sc?
+      sc = map.sc
+      tr = map.tr
+      center = projection.invert(oldCenter)
+
+    else
+      sc = minScale
+      tr = [0, 0]
+      center = [0, 0]
 
     svg.select('.zoomrect')
         .attr('width', map.width)
         .attr('height', map.height)
 
-    updateProjection(d3.min([map.width / extent.w, map.height / extent.h]), [0, 0])
-    map.centerAt([0, 0], map.sc)
-    zoom.scaleExtent([map.sc, 3])
+    updateProjection(sc, tr)
+    map.centerAt(center, map.sc)
+    zoom.scaleExtent([minScale, 3])
 
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
