@@ -59,9 +59,10 @@ initialize = (db) ->
   )
 
   map.dispatch.ready()
+  return map
 
 
 app.load = (url) ->
   d3.json url, (error, db) ->
     if error then return console.error(error)
-    initialize(db)
+    window.map = initialize(db)
