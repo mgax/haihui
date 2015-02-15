@@ -38,5 +38,4 @@ app.along = (points, distance) ->
           coordinates: target
         }
       }
-
-
+    prev = point
