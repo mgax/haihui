@@ -39,6 +39,23 @@ ensureDir = (path) ->
   fs.mkdirSync(path) unless fs.existsSync(path)
 
 
+albers = (bbox) ->
+  round = (v) -> d3.round(v, 4)
+  dp = (bbox[3] - bbox[1]) / 6
+  return {
+    lat_1: round(bbox[3] + dp)
+    lat_2: round(bbox[1] - dp)
+    lat_0: round((bbox[1] + bbox[3]) / 2)
+    lon_0: round((bbox[0] + bbox[2]) / 2)
+  }
+
+
+albersProj = (param) ->
+  return "+proj=aea
+          +lat_1=#{param.lat_1} +lat_2=#{param.lat_2}
+          +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
+
+
 query = (bbox) ->
   filters = [
     'relation["route"="hiking"]'
@@ -208,6 +225,7 @@ data.dem = (region) ->
   buildDem = ->
     demDone = Q.defer()
     exec("rm -f data/contours/#{region}.*")
+    exec("rm -f data/contours/#{region}-prj.*")
     .then ->
       exec("gdalwarp
             data/srtm-1arcsec-ro.tiff
@@ -220,21 +238,28 @@ data.dem = (region) ->
             -a elevation
             -i 100")
     .then ->
+      exec("ogr2ogr
+            -t_srs '#{albersProj(albers(bbox))}'
+            data/contours/#{region}-prj.shp
+            data/contours/#{region}.shp")
+    .then ->
       exec("topojson
-            contour=data/contours/#{region}.shp
+            contour=data/contours/#{region}-prj.shp
             -o #{demPath}
             --id-property ID
             -p elevation
             -s .00000000001")
     .done ->
       dem = JSON.parse(fs.readFileSync(demPath))
+      dem.wgsBbox = bbox
+      fs.writeFileSync(demPath, JSON.stringify(dem))
       demDone.resolve(dem)
 
     return demDone.promise
 
   if fs.existsSync(demPath)
     dem = JSON.parse(fs.readFileSync(demPath))
-    if JSON.stringify(bbox) == JSON.stringify(dem.objects.contour.bbox)
+    if JSON.stringify(bbox) == JSON.stringify(dem.wgsBbox)
       console.log "using cached dem topojson"
       return Q(dem)
 
