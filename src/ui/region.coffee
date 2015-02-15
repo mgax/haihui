@@ -1,5 +1,3 @@
-app.PXKM = 6250  # convert pixels to kilometers
-app.DEGM = 20000000 / 180 # convert degrees to meters
 app.ACTIONBAR_HEIGHT = 30
 
 
