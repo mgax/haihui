@@ -80,7 +80,7 @@ app.location = (options) ->
 
   positionUpdate = ->
     showLocation()
-    if locationMode == LOCATION_TRACK
+    if locationMode == LOCATION_TRACK and location
       pos = location.pos
       if app.inside(location.pos, map.db.bbox)
         map.centerAt(location.pos)
