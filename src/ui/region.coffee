@@ -3,17 +3,6 @@ app.DEGM = 20000000 / 180 # convert degrees to meters
 app.ACTIONBAR_HEIGHT = 30
 
 
-app.index = (objects) ->
-  map = d3.map()
-  for o in objects
-    map.set(o.id, o)
-  return map
-
-
-app.inside = (pos, bbox) ->
-  bbox[0] <= pos[0] and pos[0] < bbox[2] and bbox[1] <= pos[1] and pos[1] < bbox[3]
-
-
 initialize = (db) ->
   map = {
     db: db

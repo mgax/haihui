@@ -1,37 +1,3 @@
-segmentLength = (segment, save=false) ->
-  points = segment.geometry.coordinates
-  sum = 0
-  prev = points[0]
-  if save then prev.push(sum)
-
-  for point in points.slice(1)
-    dx = point[0] - prev[0]
-    dy = point[1] - prev[1]
-    delta = Math.sqrt(dx*dx + dy*dy)
-    if save then point.push(sum += delta)
-    prev = point
-
-  if save then segment.properties.length = sum
-  return sum
-
-
-along = (segment, distance) ->
-  points = segment.geometry.coordinates
-  prev = points[0]
-  for point in points.slice(1)
-    if point[3] >= distance
-      f = (distance - prev[3]) / (point[3] - prev[3])
-      dx = point[0] - prev[0]
-      dy = point[1] - prev[1]
-      target = [prev[0] + dx * f, prev[1] + dy * f]
-      return {
-        geometry: {
-          type: 'Point'
-          coordinates: target
-        }
-      }
-
-
 app.features = (options) ->
   map = options.map
   db = map.db
@@ -44,7 +10,7 @@ app.features = (options) ->
   segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = app.index(segmentLayer)
   for segment in segmentLayer
-    segmentLength(segment, true)
+    app.segmentLength(segment, true)
 
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
   riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
@@ -90,7 +56,7 @@ app.features = (options) ->
     for segment in segmentLayer
       length = segment.properties.length
       for n in d3.range(0, d3.round(length / interval))
-        point = along(segment, interval * (n + 0.5))
+        point = app.along(segment, interval * (n + 0.5))
         point.properties = {symbols: segment.properties.symbols}
         [x, y] = map.projection(point.geometry.coordinates)
         if app.inside([x, y], [0, 0, map.width, map.height])
