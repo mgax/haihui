@@ -105,7 +105,8 @@ compileOsm = (bbox, osm, dem) ->
   highways = []
   rivers = []
 
-  projection = proj4(albersProj(albers(bbox)))
+  projParams = albersProj(albers(bbox))
+  projection = proj4(projParams)
 
   project = (coord) -> [x, y] = projection.forward(coord); [+x, +y]
 
@@ -220,8 +221,9 @@ compileOsm = (bbox, osm, dem) ->
       'property-transform': (f) -> f.properties
     })
     dem: dem
-    bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
     routes: route(obj[id]) for id in routeIds.values()
+    bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
+    projParams: projParams
   }
 
 

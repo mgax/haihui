@@ -12,6 +12,9 @@ app.canvas = (options) ->
     h: d3.max([-bbox[1], bbox[3]]) * 2
   }
 
+  proj = proj4(map.db.projParams)
+  map.wgsProjection = (p) -> [x, y] = proj.forward(p); return [+x, +y]
+
   projection = map.projection = ([x, y]) -> [
     (x - bbox[0]) * map.sc + map.tr[0]
     (bbox[3] - y) * map.sc + map.tr[1]

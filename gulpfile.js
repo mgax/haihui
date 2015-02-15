@@ -51,7 +51,10 @@ gulp.task('libs', function() {
       fs.writeFileSync('build/topojson.min.js', body);
       request(cdnjs + 'twitter-bootstrap/3.3.2/css/bootstrap.min.css', function(err, res, body) {
         fs.writeFileSync('build/bootstrap.min.css', body);
-        done.resolve();
+        request(cdnjs + 'proj4js/2.3.3/proj4.js', function(err, res, body) {
+          fs.writeFileSync('build/proj4.js', body);
+          done.resolve();
+        });
       });
     });
   });
