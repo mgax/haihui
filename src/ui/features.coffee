@@ -49,9 +49,10 @@ app.features = (options) ->
   renderSymbols = ->
     symbols.selectAll('.symbol').remove()
 
-    interval = 80 * app.PXKM / (map.s0 * map.sc)
+    interval = 80 / map.sc / 1000
     segmentSymbols = []
     for segment in segmentLayer
+      continue
       length = turf.lineDistance(segment, 'kilometers')
       for n in d3.range(0, d3.round(length / interval))
         point = turf.along(segment, interval * (n + 0.5), 'kilometers')

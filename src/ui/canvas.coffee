@@ -4,30 +4,39 @@ app.canvas = (options) ->
 
   map.width = 1
   map.height = 1
-  center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
-  map.s0 = 1
   map.sc = 1
-  t0 = [0, 0]
-  tr = [0, 0]
-  f0 = 1
+  map.tr = [0, 0]
 
-  projection = map.projection = d3.geo.albers()
-      .center([0, center[1]])
-      .rotate([-center[0], 0])
-      .parallels([center[1] - 5, center[1] + 5])
-      .scale(1)
+  extent = {
+    w: d3.max([-bbox[0], bbox[2]]) * 2
+    h: d3.max([-bbox[1], bbox[3]]) * 2
+  }
 
-  _sw = projection(bbox.slice(0, 2))
-  _ne = projection(bbox.slice(2, 4))
-  boxWidth = _ne[0] - _sw[0]
-  boxHeight = _sw[1] - _ne[1]
+  projection = map.projection = ([x, y]) -> [
+    (x - bbox[0]) * map.sc + map.tr[0]
+    (bbox[3] - y) * map.sc + map.tr[1]
+  ]
+
+  projection.invert = ([px, py]) -> [
+    bbox[0] + (px - map.tr[0]) / map.sc
+    bbox[3] - (py - map.tr[1]) / map.sc
+  ]
+
+  projection.stream = (s) -> {
+    point: (x, y, z) -> [px, py] = projection([x, y]); s.point(px, py, z)
+    sphere: -> s.sphere()
+    lineStart: -> s.lineStart()
+    lineEnd: -> s.lineEnd()
+    polygonStart: -> s.polygonStart()
+    polygonEnd: -> s.polygonEnd()
+    valid: true
+  }
 
   zoom = d3.behavior.zoom()
-      .scaleExtent([1, 1000])
 
   simplify = d3.geo.transform(
     point: (x, y, z) ->
-      if z? and z >= f0 / map.sc / 300
+      if z? and z >= 300 / map.sc
         return @stream.point(x, y)
   )
 
@@ -54,17 +63,12 @@ app.canvas = (options) ->
     map.width = parseInt(d3.select('body').style('width'))
     map.height = parseInt(d3.select('body').style('height'))
 
-    projection.scale(map.s0 = d3.min([map.width / boxWidth, map.height / boxHeight]))
-    f0 = (bbox[2] - bbox[0]) / boxWidth / map.s0
-
     svg.select('.zoomrect')
         .attr('width', map.width)
         .attr('height', map.height)
 
-    projection.translate(t0 = [map.width / 2, map.height / 2])
-
-    zoom.scale(1).translate([0, 0])
-    updateProjection(1, [0, 0])
+    updateProjection(d3.min([map.width / extent.w, map.height / extent.h]), [0, 0])
+    map.centerAt([0, 0], map.sc)
 
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
@@ -73,14 +77,10 @@ app.canvas = (options) ->
 
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
-    tr = new_tr
-    projection
-        .scale(map.s0 * map.sc)
-        .translate([t0[0] * map.sc + tr[0], t0[1] * map.sc + tr[1]])
+    map.tr = new_tr
     clip.extent([projection.invert([0, map.height]), projection.invert([map.width, 0])])
 
-  map.centerAt = (pos) ->
-    new_sc = 8000000 / map.s0
+  map.centerAt = (pos, new_sc=8000000) ->
     updateProjection(new_sc, [0, 0])
     xy = projection(pos)
     new_tr = [map.width / 2 - xy[0], map.height / 2 - xy[1]]
