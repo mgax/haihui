@@ -299,5 +299,4 @@ data.html = ->
   index_manifest = index_appcache(timestamp: timestamp)
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
-  fs.writeFileSync("build/turfbits.js", fs.readFileSync("turfbits.js"))
   fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
