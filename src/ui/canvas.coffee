@@ -43,19 +43,21 @@ app.canvas = (options) ->
   map.path = d3.geo.path()
       .projection(stream: (s) -> simplify.stream(clip.stream(projection.stream(s))))
 
-  svg = d3.select('body').append('svg')
+  backLayer = d3.select('body').append('svg').attr('class', 'backLayer')
+  symbolLayer = d3.select('body').append('svg').attr('class', 'symbolLayer')
+  uiLayer = d3.select('body').append('svg').attr('class', 'uiLayer')
 
   canvas = {}
-  canvas.contours = svg.append('g')
-  canvas.features = svg.append('g')
-  canvas.symbols = svg.append('g')
-  canvas.locationg = svg.append('g').attr('class', 'location')
+  canvas.contours = backLayer.append('g')
+  canvas.features = backLayer.append('g')
+  canvas.symbols = symbolLayer.append('g')
+  canvas.locationg = symbolLayer.append('g').attr('class', 'location')
 
-  svg.append('rect')
+  uiLayer.append('rect')
       .attr('class', 'zoomrect')
       .call(zoom)
 
-  actionbar = canvas.actionbar = svg.append('g')
+  actionbar = canvas.actionbar = uiLayer.append('g')
       .attr('class', 'actionbar')
 
   resize = ->
@@ -76,7 +78,7 @@ app.canvas = (options) ->
       tr = [0, 0]
       center = [0, 0]
 
-    svg.select('.zoomrect')
+    uiLayer.select('.zoomrect')
         .attr('width', map.width)
         .attr('height', map.height)
 
