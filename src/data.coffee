@@ -300,3 +300,36 @@ data.html = ->
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
   fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
+
+
+projectionError = (def, bbox, lng, lat) ->
+  projection = proj4(def)
+  proj = (p) -> [x, y] = projection.forward(p); [+x, +y]
+  dist = (a, b) -> Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]))
+  turfdist = (ta, tb) -> turf.distance(ta, tb, 'kilometers') * 1000
+
+  err = (p1, p2) ->
+    1 - dist(proj(p1), proj(p2)) / turfdist(turf.point(p1), turf.point(p2))
+
+  return [
+    d3.round(err([lng, lat], [lng + .00001, lat]), 6)
+    d3.round(err([lng, lat], [lng, lat + .00001]), 6)
+  ]
+
+
+data.err = (region) ->
+  bbox = data.REGION[region].bbox
+  errors = (def) ->
+    console.log projectionError(def, bbox, bbox[0], bbox[1])
+    console.log projectionError(def, bbox, bbox[2], bbox[3])
+    console.log projectionError(def, bbox, bbox[2], bbox[1])
+    console.log projectionError(def, bbox, bbox[0], bbox[3])
+    console.log projectionError(def, bbox, (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
+    console.log projectionError(def, bbox, bbox[0], (bbox[1] + bbox[3]) / 2)
+    console.log projectionError(def, bbox, bbox[2], (bbox[1] + bbox[3]) / 2)
+    console.log projectionError(def, bbox, (bbox[0] + bbox[2]) / 2, bbox[1])
+    console.log projectionError(def, bbox, (bbox[0] + bbox[2]) / 2, bbox[3])
+  console.log 'albers'
+  errors(albersProj(albers(bbox)))
+  console.log 'stereo70'
+  errors('+proj=sterea +lat_0=46 +lon_0=25 +k=0.99975 +x_0=500000 +y_0=500000 +ellps=krass +units=m +no_defs')
