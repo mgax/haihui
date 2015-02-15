@@ -52,7 +52,7 @@ albers = (bbox) ->
 
 
 albersProj = (param) ->
-  return "+proj=aea +x0=0 +y0=0
+  return "+proj=aea +x0=0 +y0=0 +units=m +no_defs
           +lat_1=#{param.lat_1} +lat_2=#{param.lat_2}
           +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
 
