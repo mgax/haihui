@@ -4,6 +4,7 @@ fs = require('fs')
 request = require('request')
 topojson = require('topojson')
 turf = require('turf')
+proj4 = require('proj4')
 Q = require('q')
 
 data = module.exports = {}
@@ -51,7 +52,7 @@ albers = (bbox) ->
 
 
 albersProj = (param) ->
-  return "+proj=aea
+  return "+proj=aea +x0=0 +y0=0
           +lat_1=#{param.lat_1} +lat_2=#{param.lat_2}
           +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
 
@@ -104,17 +105,25 @@ compileOsm = (bbox, osm, dem) ->
   highways = []
   rivers = []
 
-  pos = (id) ->
-    node = obj[id]
-    return [node.lon, node.lat]
+  projection = proj4(albersProj(albers(bbox)))
+
+  project = (coord) ->
+    [x, y] = projection.forward(coord)
+    return [d3.round(+x), d3.round(+y)]
+
+  projectNode = (node) -> project([node.lon, node.lat])
+
+  point = (node) -> turf.point(projectNode(node))
+
+  linestring = (nodes) -> turf.linestring(projectNode(obj[n]) for n in nodes)
 
   segment = (id) ->
-    f = turf.linestring(pos(n) for n in obj[id].nodes)
+    f = linestring(obj[id].nodes)
     f.id = id
     return f
 
   natural = (node) ->
-    f = turf.point([node.lon, node.lat])
+    f = point(node)
     f.id = node.id
     f.properties = {
       name: node.tags.name
@@ -125,7 +134,7 @@ compileOsm = (bbox, osm, dem) ->
   tourism = (obj) ->
     switch obj.type
       when 'node'
-        f = turf.point([obj.lon, obj.lat])
+        f = point(obj)
       when 'way'
         f = turf.centroid(segment(obj.id))
     f.id = obj.id
@@ -136,7 +145,7 @@ compileOsm = (bbox, osm, dem) ->
     return f
 
   shelter = (obj) ->
-    f = turf.point([obj.lon, obj.lat])
+    f = point(obj)
     f.id = obj.id
     f.properties = {
       name: obj.tags.name
@@ -145,7 +154,7 @@ compileOsm = (bbox, osm, dem) ->
     return f
 
   highway = (obj) ->
-    f = turf.linestring(pos(n) for n in obj.nodes)
+    f = linestring(obj.nodes)
     grade = switch obj.tags.highway
       when 'track' then 'path'
       when 'path' then 'path'
@@ -158,7 +167,7 @@ compileOsm = (bbox, osm, dem) ->
     return f
 
   river = (obj) ->
-    turf.linestring(pos(n) for n in obj.nodes)
+    linestring(obj.nodes)
 
   route = (relation) ->
     segments = []
@@ -213,7 +222,7 @@ compileOsm = (bbox, osm, dem) ->
       'property-transform': (f) -> f.properties
     })
     dem: dem
-    bbox: bbox
+    bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
     routes: route(obj[id]) for id in routeIds.values()
   }
 
