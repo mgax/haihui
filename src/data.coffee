@@ -65,6 +65,8 @@ query = (bbox) ->
     'node["amenity"="shelter"]["shelter_type"="basic_hut"]'
     'way["highway"~""]'
     'way["waterway"~""]'
+    'way["water"="lake"]'
+    'way["water"="reservoir"]'
     'node["tourism"~""]'
     'way["tourism"~""]'
   ]
@@ -104,6 +106,7 @@ compileOsm = (bbox, osm, dem) ->
   poi = []
   highways = []
   rivers = []
+  lakes = []
 
   projParams = albersProj(albers(bbox))
   projection = proj4(projParams)
@@ -115,6 +118,8 @@ compileOsm = (bbox, osm, dem) ->
   point = (node) -> turf.point(projectNode(node))
 
   linestring = (nodes) -> turf.linestring(projectNode(obj[n]) for n in nodes)
+
+  polygon = (nodes) -> turf.polygon([projectNode(obj[n]) for n in nodes])
 
   segment = (id) ->
     f = linestring(obj[id].nodes)
@@ -168,6 +173,11 @@ compileOsm = (bbox, osm, dem) ->
   river = (obj) ->
     linestring(obj.nodes)
 
+  lake = (obj) ->
+    f = polygon(obj.nodes)
+    f.properties = {name: obj.tags.name}
+    return f
+
   route = (relation) ->
     segments = []
     for m in relation.members
@@ -208,11 +218,15 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'way' and o.tags.waterway?
       rivers.push(river(o))
 
+    if o.type == 'way' and (o.tags.water == 'lake' or o.tags.water == 'reservoir')
+      lakes.push(lake(o))
+
   layers = {
     segments: turf.featurecollection(segment(id) for id in segmentIds.values())
     poi: turf.featurecollection(poi)
     highways: turf.featurecollection(highways)
     rivers: turf.featurecollection(rivers)
+    lakes: turf.featurecollection(lakes)
   }
 
   return {

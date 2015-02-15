@@ -2,11 +2,13 @@ app.features = (options) ->
   map = options.map
   db = map.db
 
+  lakes = options.g.append('g')
   rivers = options.g.append('g')
   highways = options.g.append('g')
   segments = options.g.append('g')
   symbols = options.symbols
 
+  lakesLayer = topojson.feature(db.topo, db.topo.objects.lakes).features
   segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = app.index(segmentLayer)
   for s in segmentLayer
@@ -28,6 +30,11 @@ app.features = (options) ->
     .enter().append('path')
       .attr('class', 'segment')
 
+  lakes.selectAll('.lake')
+      .data(lakesLayer)
+    .enter().append('path')
+      .attr('class', 'lake')
+
   rivers.selectAll('.river')
       .data(riversLayer)
     .enter().append('path')
@@ -40,6 +47,9 @@ app.features = (options) ->
 
   render = ->
     segments.selectAll('.segment')
+        .attr('d', map.path)
+
+    lakes.selectAll('.lake')
         .attr('d', map.path)
 
     rivers.selectAll('.river')
