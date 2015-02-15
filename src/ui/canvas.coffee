@@ -89,12 +89,25 @@ app.canvas = (options) ->
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
 
+    resetBackLayer()
     map.dispatch.redraw()
 
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
     map.tr = new_tr
     clip.extent([projection.invert([0, map.height]), projection.invert([map.width, 0])])
+
+  resetBackLayer = ->
+    transformBackLayer((map.scBase = map.sc), (map.trBase = map.tr))
+
+  transformBackLayer = (scZoom, trZoom) ->
+    scDelta = scZoom / map.scBase
+    trDelta = [
+      trZoom[0] - map.trBase[0] * scDelta + (scDelta - 1) * map.width / 2
+      trZoom[1] - map.trBase[1] * scDelta + (scDelta - 1) * map.height / 2
+    ]
+    transform = "translate3d(#{trDelta[0]}px,#{trDelta[1]}px,0px) scale(#{scDelta})"
+    backLayer.attr('style', "-webkit-transform: #{transform}")
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
@@ -106,9 +119,11 @@ app.canvas = (options) ->
 
   zoom.on 'zoom', ->
     updateProjection(d3.event.scale, d3.event.translate)
+    transformBackLayer(d3.event.scale, d3.event.translate)
     map.dispatch.zoom()
 
   zoom.on 'zoomend', ->
+    resetBackLayer()
     map.dispatch.zoomend()
 
   d3.select(window).on('resize', resize)

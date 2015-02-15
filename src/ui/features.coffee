@@ -98,6 +98,8 @@ app.features = (options) ->
     renderSymbols()
 
   map.dispatch.on 'zoom.features', ->
-    render()
     updateSymbols()
-  map.dispatch.on('zoomend.features', renderSymbols)
+
+  map.dispatch.on 'zoomend.features', ->
+    render()
+    renderSymbols()

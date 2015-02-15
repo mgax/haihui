@@ -27,4 +27,4 @@ app.dem = (options) ->
             .text(ring.properties.elevation)
 
   map.dispatch.on('redraw.contours', renderContours)
-  map.dispatch.on('zoom.contours', renderContours)
+  map.dispatch.on('zoomend.contours', renderContours)
