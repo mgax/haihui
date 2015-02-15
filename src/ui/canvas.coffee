@@ -72,6 +72,7 @@ app.canvas = (options) ->
 
     updateProjection(d3.min([map.width / extent.w, map.height / extent.h]), [0, 0])
     map.centerAt([0, 0], map.sc)
+    zoom.scaleExtent([map.sc, 3])
 
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
