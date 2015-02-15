@@ -255,7 +255,7 @@ data.dem = (region) ->
             -o #{demPath}
             --id-property ID
             -p elevation
-            -s .00000000001")
+            -s 500")
     .done ->
       dem = JSON.parse(fs.readFileSync(demPath))
       dem.wgsBbox = bbox
