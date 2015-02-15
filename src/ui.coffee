@@ -346,15 +346,8 @@ initialize = (db) ->
     location = null
     showLocation()
 
-  return {
-    db: db
-    projection: projection
-    path: path
-    zoom: zoom
-  }
-
 
 app.load = (url) ->
   d3.json url, (error, db) ->
     if error then return console.error(error)
-    window.map = initialize(db)
+    initialize(db)
