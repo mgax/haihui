@@ -48,6 +48,7 @@ app.canvas = (options) ->
   canvas = {}
   canvas.contours = svg.append('g')
   canvas.features = svg.append('g')
+  canvas.symbols = svg.append('g')
   canvas.locationg = svg.append('g').attr('class', 'location')
 
   svg.append('rect')

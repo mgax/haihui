@@ -43,6 +43,7 @@ initialize = (db) ->
   app.features(
     map: map
     g: canvas.features
+    symbols: canvas.symbols
   )
 
   map.dispatch.ready()

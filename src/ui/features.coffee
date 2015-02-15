@@ -5,7 +5,7 @@ app.features = (options) ->
   rivers = options.g.append('g')
   highways = options.g.append('g')
   segments = options.g.append('g')
-  symbols = options.g.append('g')
+  symbols = options.symbols
 
   segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = app.index(segmentLayer)
