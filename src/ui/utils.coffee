@@ -11,10 +11,13 @@ app.inside = (pos, bbox) ->
 
 app.length = (points, save=false) ->
   sum = 0
-  prev = points[0]
-  if save then prev.push(sum)
+  prev = null
 
-  for point in points.slice(1)
+  for point in points
+    unless prev?
+      prev = point
+      if save then prev.push(sum)
+      continue
     dx = point[0] - prev[0]
     dy = point[1] - prev[1]
     delta = Math.sqrt(dx*dx + dy*dy)
@@ -25,8 +28,11 @@ app.length = (points, save=false) ->
 
 
 app.along = (points, distance) ->
-  prev = points[0]
-  for point in points.slice(1)
+  prev = null
+  for point in points
+    unless prev?
+      prev = point
+      continue
     if point[3] >= distance
       f = (distance - prev[3]) / (point[3] - prev[3])
       dx = point[0] - prev[0]
