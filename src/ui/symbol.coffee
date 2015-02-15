@@ -1,5 +1,13 @@
 app.symbol = {}
 
+textWithHalo = (label) ->
+  (selection) ->
+    selection.append('text')
+        .attr('class', 'halo')
+        .text(label)
+    selection.append('text')
+        .text(label)
+
 app.symbol.osmc = (src) ->
   bits = src.split(':')
   foreground = bits[2].split('_')
@@ -62,10 +70,9 @@ app.symbol.alpine_hut = (selection) ->
       .attr('class', 'symbol-alpine_hut')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
-  selection.append('text')
-      .text(selection.datum().properties.name)
-      .attr('x', 10)
-      .attr('y', -2)
+  selection.append('g')
+      .attr('transform', "translate(10,-2)")
+      .call(textWithHalo(selection.datum().properties.name))
 
 app.symbol.chalet = app.symbol.alpine_hut
 app.symbol.hotel = app.symbol.alpine_hut
@@ -76,10 +83,9 @@ app.symbol.basic_hut = (selection) ->
       .attr('class', 'symbol-basic_hut')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
-  selection.append('text')
-      .text(selection.datum().properties.name)
-      .attr('x', 10)
-      .attr('y', -2)
+  selection.append('g')
+      .attr('transform', "translate(10,-2)")
+      .call(textWithHalo(selection.datum().properties.name))
 
 
 app.symbol.peak = (selection) ->
@@ -87,9 +93,9 @@ app.symbol.peak = (selection) ->
       .attr('class', 'symbol-peak')
       .attr('d', "M0,-5 L5,3 L-5,3 L0,-5")
 
-  selection.append('text')
-      .text(selection.datum().properties.name)
-      .attr('x', 6)
+  selection.append('g')
+      .attr('transform', "translate(6,0)")
+      .call(textWithHalo(selection.datum().properties.name))
 
 
 app.symbol.saddle = (selection) ->
@@ -97,9 +103,9 @@ app.symbol.saddle = (selection) ->
       .attr('class', 'symbol-saddle')
       .attr('d', "M0,2 L6,-2 L6,6 L-6,6 L-6,-2 L0,2")
 
-  selection.append('text')
-      .text(selection.datum().properties.name)
-      .attr('x', 6)
+  selection.append('g')
+      .attr('transform', "translate(6,0)")
+      .call(textWithHalo(selection.datum().properties.name))
 
 
 app.symbol.locationbutton = (selection) ->

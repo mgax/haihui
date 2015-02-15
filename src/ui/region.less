@@ -11,9 +11,20 @@ svg {
     top: 0;
 }
 
-.symbol text {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 12px;
+.symbol {
+    text {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 12px;
+    }
+
+    text.halo {
+        fill: none;
+        stroke: white;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        stroke-width: 4px;
+        opacity: .7;
+    }
 }
 
 .zoomrect {
