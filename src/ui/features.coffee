@@ -9,8 +9,8 @@ app.features = (options) ->
 
   segmentLayer = topojson.feature(db.topo, db.topo.objects.segments).features
   segmentMap = app.index(segmentLayer)
-  for segment in segmentLayer
-    app.segmentLength(segment, true)
+  for s in segmentLayer
+    s.properties.length = app.length(s.geometry.coordinates, true)
 
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
   riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
@@ -56,7 +56,7 @@ app.features = (options) ->
     for segment in segmentLayer
       length = segment.properties.length
       for n in d3.range(0, d3.round(length / interval))
-        point = app.along(segment, interval * (n + 0.5))
+        point = app.along(segment.geometry.coordinates, interval * (n + 0.5))
         point.properties = {symbols: segment.properties.symbols}
         [x, y] = map.projection(point.geometry.coordinates)
         if app.inside([x, y], [0, 0, map.width, map.height])

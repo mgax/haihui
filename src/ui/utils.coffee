@@ -9,8 +9,7 @@ app.inside = (pos, bbox) ->
   bbox[0] <= pos[0] and pos[0] < bbox[2] and bbox[1] <= pos[1] and pos[1] < bbox[3]
 
 
-app.segmentLength = (segment, save=false) ->
-  points = segment.geometry.coordinates
+app.length = (points, save=false) ->
   sum = 0
   prev = points[0]
   if save then prev.push(sum)
@@ -22,12 +21,10 @@ app.segmentLength = (segment, save=false) ->
     if save then point.push(sum += delta)
     prev = point
 
-  if save then segment.properties.length = sum
   return sum
 
 
-app.along = (segment, distance) ->
-  points = segment.geometry.coordinates
+app.along = (points, distance) ->
   prev = points[0]
   for point in points.slice(1)
     if point[3] >= distance
