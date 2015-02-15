@@ -19,7 +19,6 @@ app.dem = (options) ->
 
     for ring in contourLayer
       continue if ring.properties.elevation % 300
-      length = turf.lineDistance(ring, 'kilometers') * (map.s0 * map.sc) / app.PXKM
       contours.append('text')
           .attr('class', 'contour-label')
           .append('textPath')
