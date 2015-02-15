@@ -68,9 +68,10 @@ app.features = (options) ->
       for n in d3.range(0, d3.round(length / interval))
         point = app.along(segment.geometry.coordinates, interval * (n + 0.5))
         point.properties = {symbols: segment.properties.symbols}
-        [x, y] = map.projection(point.geometry.coordinates)
-        if app.inside([x, y], [0, 0, map.width, map.height])
-          segmentSymbols.push(point)
+        if app.inside(point.geometry.coordinates, db.bbox)
+          [x, y] = map.projection(point.geometry.coordinates)
+          if app.inside([x, y], [0, 0, map.width, map.height])
+            segmentSymbols.push(point)
 
     symbols.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')

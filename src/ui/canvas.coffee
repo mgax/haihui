@@ -95,7 +95,13 @@ app.canvas = (options) ->
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
     map.tr = new_tr
-    clip.extent([projection.invert([0, map.height]), projection.invert([map.width, 0])])
+
+    [x0, y0] = projection.invert([0, map.height])
+    [x1, y1] = projection.invert([map.width, 0])
+    clip.extent([
+      [d3.max([x0, bbox[0]]), d3.max([y0, bbox[1]])]
+      [d3.min([x1, bbox[2]]), d3.min([y1, bbox[3]])]
+    ])
 
   resetBackLayer = ->
     transformBackLayer((map.scBase = map.sc), (map.trBase = map.tr))
