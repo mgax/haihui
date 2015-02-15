@@ -107,9 +107,7 @@ compileOsm = (bbox, osm, dem) ->
 
   projection = proj4(albersProj(albers(bbox)))
 
-  project = (coord) ->
-    [x, y] = projection.forward(coord)
-    return [d3.round(+x), d3.round(+y)]
+  project = (coord) -> [x, y] = projection.forward(coord); [+x, +y]
 
   projectNode = (node) -> project([node.lon, node.lat])
 
