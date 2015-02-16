@@ -7,6 +7,8 @@
 
 <body>
 
+<div class="splash"><div class="loader">Loading...</div></div>
+
 <script>
   if(window.applicationCache) {
     applicationCache.addEventListener('updateready', function() {
@@ -21,7 +23,7 @@
 <script src="../proj4.js"></script>
 <script>window.app = {};</script>
 <script src="../ui.js"></script>
-<script>app.load('data.json');</script>
+<script>setTimeout(function() { app.load('data.json') }, 0);</script>
 
 <!-- Piwik -->
 <script type="text/javascript">

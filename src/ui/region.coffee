@@ -46,6 +46,7 @@ initialize = (db) ->
     symbols: canvas.symbols
   )
 
+  d3.select('.splash').remove()
   map.dispatch.ready()
   return map
 
