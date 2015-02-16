@@ -43,15 +43,14 @@ app.canvas = (options) ->
   map.path = d3.geo.path()
       .projection(stream: (s) -> simplify.stream(clip.stream(projection.stream(s))))
 
-  backLayer = d3.select('body').append('svg').attr('class', 'backLayer')
-  symbolLayer = d3.select('body').append('svg').attr('class', 'symbolLayer')
+  mapLayer = d3.select('body').append('svg').attr('class', 'mapLayer')
   uiLayer = d3.select('body').append('svg').attr('class', 'uiLayer')
 
   canvas = {}
-  canvas.contours = backLayer.append('g')
-  canvas.features = backLayer.append('g')
-  canvas.symbols = symbolLayer.append('g')
-  canvas.locationg = symbolLayer.append('g').attr('class', 'location')
+  canvas.contours = mapLayer.append('g')
+  canvas.features = mapLayer.append('g')
+  canvas.symbols = mapLayer.append('g')
+  canvas.locationg = mapLayer.append('g').attr('class', 'location')
 
   uiLayer.append('rect')
       .attr('class', 'zoomrect')
@@ -89,7 +88,7 @@ app.canvas = (options) ->
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
 
-    resetBackLayer()
+    resetMap()
     map.dispatch.redraw()
 
   updateProjection = (new_sc, new_tr) ->
@@ -103,10 +102,10 @@ app.canvas = (options) ->
       [d3.min([x1, bbox[2]]), d3.min([y1, bbox[3]])]
     ])
 
-  resetBackLayer = ->
-    transformBackLayer((map.scBase = map.sc), (map.trBase = map.tr))
+  resetMap = ->
+    transformMap((map.scBase = map.sc), (map.trBase = map.tr))
 
-  transformBackLayer = (scZoom, trZoom) ->
+  transformMap = (scZoom, trZoom) ->
     scDelta = scZoom / map.scBase
     trDelta = [
       trZoom[0] - map.trBase[0] * scDelta + (scDelta - 1) * map.width / 2
@@ -117,8 +116,7 @@ app.canvas = (options) ->
     style = "-webkit-transform: #{transform};
                      transform: #{transform}"
 
-    backLayer.attr('style', style)
-    symbolLayer.attr('style', style)
+    mapLayer.attr('style', style)
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
@@ -130,11 +128,11 @@ app.canvas = (options) ->
 
   zoom.on 'zoom', ->
     updateProjection(d3.event.scale, d3.event.translate)
-    transformBackLayer(d3.event.scale, d3.event.translate)
+    transformMap(d3.event.scale, d3.event.translate)
     map.dispatch.zoom()
 
   zoom.on 'zoomend', ->
-    resetBackLayer()
+    resetMap()
     map.dispatch.zoomend()
 
   d3.select(window).on('resize', resize)

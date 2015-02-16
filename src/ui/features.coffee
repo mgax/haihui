@@ -58,7 +58,6 @@ app.features = (options) ->
     highways.selectAll('.highway')
         .attr('d', map.path)
 
-  renderSymbols = ->
     symbols.selectAll('.symbol').remove()
 
     interval = 80 / map.sc
@@ -97,17 +96,12 @@ app.features = (options) ->
           if (drawSymbol = app.symbol[poi.properties.type])?
             drawSymbol(d3.select(@))
 
-    updateSymbols()
-
-  updateSymbols = ->
     symbols.selectAll('.symbol')
         .attr 'transform', (d) ->
           "translate(#{d3.round(d) for d in map.projection(d.geometry.coordinates)})"
 
   map.dispatch.on 'redraw.features', ->
     render()
-    renderSymbols()
 
   map.dispatch.on 'zoomend.features', ->
     render()
-    renderSymbols()
