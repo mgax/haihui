@@ -114,6 +114,7 @@ app.canvas = (options) ->
     ]
     transform = "translate3d(#{trDelta[0]}px,#{trDelta[1]}px,0px) scale(#{scDelta})"
     backLayer.attr('style', "-webkit-transform: #{transform}")
+    backLayer.attr('style',         "transform: #{transform}")
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
