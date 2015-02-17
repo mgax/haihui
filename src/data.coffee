@@ -5,6 +5,7 @@ request = require('request')
 topojson = require('topojson')
 turf = require('turf')
 proj4 = require('proj4')
+crypto = require('crypto')
 Q = require('q')
 
 data = module.exports = {}
@@ -295,24 +296,49 @@ data.html = ->
     Handlebars.compile(fs.readFileSync("templates/#{name}", encoding: 'utf-8'))
 
   index_html = template('index.html')
-  index_appcache = template('index.appcache')
   region_html = template('region.html')
-  region_appcache = template('region.appcache')
+  manifest_appcache = template('manifest.appcache')
 
-  timestamp = (new Date()).toJSON()
   regions = Object.keys(data.REGION).sort()
+
+  checksum = (filePath) ->
+    hash = crypto.createHash('sha1')
+    if /\/$/.test(filePath)
+      filePath += 'index.html'
+    hash.update(fs.readFileSync(filePath))
+    return hash.digest('hex')
+
+  manifest = (directory, fileNameList) ->
+    fileList = fileNameList.map (name) -> {
+      name: name
+      checksum: checksum("#{directory}/#{name}")
+    }
+    return manifest_appcache(fileList: fileList)
+
   for region in regions
     ensureDir("build/#{region}")
     fs.writeFileSync(
       "build/#{region}/index.html",
       region_html(title: data.REGION[region].title)
     )
-    region_manifest = region_appcache(timestamp: timestamp)
+    region_manifest = manifest("build/#{region}", [
+      './'
+      '../region.css'
+      '../d3.min.js'
+      '../topojson.min.js'
+      '../proj4.js'
+      '../ui.js'
+      './data.json'
+    ])
     fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
 
   regionList = ({slug: r, title: data.REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
-  index_manifest = index_appcache(timestamp: timestamp)
+  index_manifest = manifest("build", [
+    './'
+    './screenshot.jpg'
+    './bootstrap.min.css'
+  ])
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
   fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))

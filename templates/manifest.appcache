@@ -1,13 +1,14 @@
 CACHE MANIFEST
 
-# rev {{ timestamp }}
-
 CACHE:
-./
-./screenshot.jpg
-./bootstrap.min.css
+{{#fileList}}
+# {{ checksum }}
+{{ name }}
 
+{{/fileList}}
 
 NETWORK:
+../ui.js.map
+../region.css.map
 http://apti.ro/trafic/piwik.js
 http://apti.ro/trafic/piwik.php
