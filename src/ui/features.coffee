@@ -25,6 +25,10 @@ app.features = (options) ->
         segment.properties.symbols = [] unless segment.properties.symbols?
         segment.properties.symbols.push(route.symbol)
 
+  labelWidthG = symbols.append('g').attr('transform', "translate(0,-100)")
+  app.symbol.calculateLabelWidth(labelWidthG, poiLayer)
+  labelWidthG.remove()
+
   segments.selectAll('.segment')
       .data(segmentLayer)
     .enter().append('path')

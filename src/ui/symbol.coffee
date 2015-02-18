@@ -8,6 +8,23 @@ textWithHalo = (label) ->
     selection.append('text')
         .text(label)
 
+
+app.symbol.calculateLabelWidth = (g, poiLayer) ->
+  g.selectAll('text')
+      .data(poiLayer)
+    .enter().append('text')
+      .attr('class', 'halo')
+      .text((d) -> d.properties.name)
+
+  g.selectAll('text')
+      .each (d) ->
+        bbox = @getBBox()
+        d.properties.labelSize = {
+          w: Math.ceil(bbox.width)
+          h: Math.ceil(bbox.height)
+        }
+
+
 app.symbol.osmc = (src) ->
   bits = src.split(':')
   foreground = bits[2].split('_')
