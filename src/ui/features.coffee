@@ -68,13 +68,17 @@ app.features = (options) ->
         point = app.along(segment.geometry.coordinates, interval * (n + 0.5))
         point.properties = {symbols: segment.properties.symbols}
         if app.inside(point.geometry.coordinates, db.bbox)
-          [x, y] = map.projection(point.geometry.coordinates)
+          xyproj = map.projection(point.geometry.coordinates)
+          x = d3.round(xyproj[0])
+          y = d3.round(xyproj[1])
           if app.inside([x, y], [0, 0, map.width, map.height])
-            segmentSymbols.push(point)
+            symbol = {properties: point.properties, x: x, y: y}
+            segmentSymbols.push(symbol)
 
     symbols.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')
         .attr('class', 'symbol segmentSymbol')
+        .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each (d) ->
           return unless d.properties.symbols
           for i in d3.range(0, d.properties.symbols.length)
@@ -85,20 +89,20 @@ app.features = (options) ->
 
     poiSymbols = []
     for poi in poiLayer
-      [x, y] = map.projection(poi.geometry.coordinates)
+      xyproj = map.projection(poi.geometry.coordinates)
+      x = d3.round(xyproj[0])
+      y = d3.round(xyproj[1])
       if x > 0 and x < map.width and y > 0 and y < map.height
-        poiSymbols.push(poi)
+        symbol = {properties: poi.properties, x: x, y: y}
+        poiSymbols.push(symbol)
 
     symbols.selectAll('.poiSymbol').data(poiSymbols)
       .enter().append('g')
         .attr('class', 'symbol poiSymbol')
+        .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each (poi) ->
           if (drawSymbol = app.symbol[poi.properties.type])?
             drawSymbol(d3.select(@))
-
-    symbols.selectAll('.symbol')
-        .attr 'transform', (d) ->
-          "translate(#{d3.round(d) for d in map.projection(d.geometry.coordinates)})"
 
   map.dispatch.on 'redraw.features', ->
     render()
