@@ -116,7 +116,7 @@ app.features = (options) ->
         .extent([[0, 0], [map.width, map.height]])
         .x (d) -> d.x
         .y (d) -> d.y
-        )(symbolList)
+        )([])
 
     # search distance
     sw = d3.max(symbolList, (s) -> s.hw)
@@ -145,7 +145,7 @@ app.features = (options) ->
       thh = size.h / 2
       tx = symbol.x + mask.hw + thw + 1
       ty = symbol.y + mask.hh - 2 * thh
-      unless collides(tx, ty, thw, thh)
+      unless collides(tx, ty, thw + 1, thh + 1)
         if (name = symbol.properties.name)?
           g = symbols.append('g')
               .attr('class', 'symbolLabel')
