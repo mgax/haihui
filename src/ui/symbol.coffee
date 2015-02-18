@@ -25,6 +25,21 @@ app.symbol.calculateLabelWidth = (g, poiLayer) ->
         }
 
 
+app.symbol.render = (symbol) ->
+  if symbol.segmentSymbol
+    app.symbol.segmentSymbol(symbol, d3.select(@))
+  else
+    app.symbol[symbol.properties.type](d3.select(@))
+
+
+app.symbol.segmentSymbol = (symbol, group) ->
+  for i in d3.range(0, symbol.properties.symbols.length)
+    dx = - d3.round(13 / 2 * (symbol.properties.symbols.length - 1))
+    g = group.append('g')
+        .attr('transform', "translate(#{i * 13 + dx},0)")
+    app.symbol.osmc(symbol.properties.symbols[i])(g)
+
+
 app.symbol.osmc = (src) ->
   bits = src.split(':')
   foreground = bits[2].split('_')

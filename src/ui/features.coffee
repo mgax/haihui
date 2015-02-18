@@ -65,7 +65,7 @@ app.features = (options) ->
     symbols.selectAll('.symbol').remove()
 
     interval = 80 / map.sc
-    segmentSymbols = []
+    symbolList = []
     for segment in segmentLayer
       length = segment.properties.length
       for n in d3.range(0, d3.round(length / interval))
@@ -77,21 +77,14 @@ app.features = (options) ->
             x = d3.round(xyproj[0])
             y = d3.round(xyproj[1])
             if app.inside([x, y], [0, 0, map.width, map.height])
-              symbol = {properties: point.properties, x: x, y: y}
-              segmentSymbols.push(symbol)
+              symbol = {
+                segmentSymbol: true
+                properties: point.properties
+                x: x
+                y: y
+              }
+              symbolList.push(symbol)
 
-    symbols.selectAll('.segmentSymbol').data(segmentSymbols)
-      .enter().append('g')
-        .attr('class', 'symbol segmentSymbol')
-        .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
-        .each (d) ->
-          for i in d3.range(0, d.properties.symbols.length)
-            dx = - d3.round(13 / 2 * (d.properties.symbols.length - 1))
-            g = d3.select(@).append('g')
-                .attr('transform', "translate(#{i * 13 + dx},0)")
-            app.symbol.osmc(d.properties.symbols[i])(g)
-
-    poiSymbols = []
     for poi in poiLayer
       xyproj = map.projection(poi.geometry.coordinates)
       x = d3.round(xyproj[0])
@@ -99,14 +92,14 @@ app.features = (options) ->
       if x > 0 and x < map.width and y > 0 and y < map.height
         if app.symbol[poi.properties.type]
           symbol = {properties: poi.properties, x: x, y: y}
-          poiSymbols.push(symbol)
+          symbolList.push(symbol)
 
-    symbols.selectAll('.poiSymbol').data(poiSymbols)
+    symbols.selectAll('.symbol')
+        .data(symbolList)
       .enter().append('g')
-        .attr('class', 'symbol poiSymbol')
+        .attr('class', 'symbol')
         .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
-        .each (poi) ->
-          app.symbol[poi.properties.type](d3.select(@))
+        .each(app.symbol.render)
 
   map.dispatch.on 'redraw.features', ->
     render()
