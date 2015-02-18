@@ -5,6 +5,7 @@ initialize = (db) ->
   map = {
     db: db
     dispatch: d3.dispatch('ready', 'zoom', 'zoomend', 'redraw')
+    debug: {}
   }
 
   topojson.presimplify(db.topo)

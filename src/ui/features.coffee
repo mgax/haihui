@@ -1,6 +1,7 @@
 app.features = (options) ->
   map = options.map
   db = map.db
+  map.debug.collisions = false
 
   lakes = options.g.append('g')
   rivers = options.g.append('g')
@@ -152,6 +153,20 @@ app.features = (options) ->
               .attr('transform', "translate(#{tx - thw},#{ty - thh - size.dy})")
           app.symbol.textWithHalo(g, name)
           qt.add(x: tx, y: ty, hw: thw, hh: thh, labelFor: symbol)
+
+    if map.debugCollisions
+      qtNodes = []
+      qt.visit((node) -> if node.point then qtNodes.push(node.point); true)
+      symbols.selectAll('.quadtreeRect').data(qtNodes)
+        .enter().append('rect')
+          .attr('class', 'symbol quadtreeRect')
+          .attr('x', (d) -> d.x - d.hw)
+          .attr('y', (d) -> d.y - d.hh)
+          .attr('width', (d) -> d.hw * 2)
+          .attr('height', (d) -> d.hh * 2)
+          .attr('fill', 'none')
+          .attr('stroke-width', 1)
+          .attr('stroke', 'red')
 
   map.dispatch.on 'redraw.features', ->
     render()
