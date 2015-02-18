@@ -138,7 +138,7 @@ app.features = (options) ->
         return qx1 > tx2 or qx2 < tx1 or qy1 > ty2 or qy2 < ty1
       return hit
 
-    for symbol in symbolList
+    for symbol in symbolList.slice().reverse()
       continue if symbol.segmentSymbol
       size = symbol.properties.labelSize
       mask = app.symbol[symbol.properties.type].mask
