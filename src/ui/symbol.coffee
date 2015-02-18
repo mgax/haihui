@@ -100,7 +100,7 @@ app.symbol.osmc = (src) ->
 app.symbol.alpine_hut = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-alpine_hut')
-      .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
+      .attr('d', "M-2,-5 L11,1 L7,1 L7,5 L-7,5 L-7,1 L-11,1 L-2,-5")
 
 app.symbol.alpine_hut.labelOffset = [10, -14]
 
@@ -119,7 +119,7 @@ app.symbol.basic_hut.labelOffset = [10, -14]
 app.symbol.peak = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-peak')
-      .attr('d', "M0,-5 L5,3 L-5,3 L0,-5")
+      .attr('d', "M0,-4 L5,4 L-5,4 L0,-4")
 
 app.symbol.peak.labelOffset = [7, -12]
 
@@ -127,7 +127,7 @@ app.symbol.peak.labelOffset = [7, -12]
 app.symbol.saddle = (selection) ->
   selection.append('path')
       .attr('class', 'symbol-saddle')
-      .attr('d', "M0,2 L6,-2 L6,6 L-6,6 L-6,-2 L0,2")
+      .attr('d', "M0,0 L6,-4 L6,4 L-6,4 L-6,-4 L0,0")
 
 app.symbol.saddle.labelOffset = [7, -12]
 
