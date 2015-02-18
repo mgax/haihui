@@ -83,14 +83,13 @@ app.canvas = (options) ->
         .attr('height', map.height)
 
     updateProjection(sc, tr)
-    map.centerAt(center, map.sc)
     zoom.scaleExtent([minScale, 3])
 
     actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
     actionbar.select('.background').attr('width', map.width)
 
+    map.centerAt(center, map.sc)
     resetMap()
-    map.dispatch.redraw()
 
   updateProjection = (new_sc, new_tr) ->
     map.sc = new_sc
