@@ -37,6 +37,16 @@ exec = (cmd) ->
   return done.promise
 
 
+httpGet = (url) ->
+  deferred = Q.defer()
+  request url, (err, res, body) ->
+    if err?
+      deferred.fail(err)
+    else
+      deferred.resolve(body)
+  return deferred.promise
+
+
 ensureDir = (path) ->
   fs.mkdirSync(path) unless fs.existsSync(path)
 
@@ -79,25 +89,26 @@ query = (bbox) ->
 
 data.build = (region) ->
   console.log("building", region)
-  deferred = Q.defer()
+  bbox = data.REGION[region].bbox
+  dem = null
 
   data.dem(region)
 
-  .then (dem) ->
-    bbox = data.REGION[region].bbox
+  .then (rv) ->
+    dem = rv
     q = query(bbox)
     url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
+    httpGet(url)
 
-    request url, (err, res, body) ->
-      p = JSON.parse(body)
-      db = compileOsm(bbox, p, dem)
-      ensureDir("build/#{region}")
-      fs.writeFileSync("build/#{region}/data.json", JSON.stringify(db))
-      console.log("done", region)
-      deferred.resolve()
+  .then (body) ->
+    p = JSON.parse(body)
+    compileOsm(bbox, p, dem)
 
-  return deferred.promise
+  .then (db) ->
+    ensureDir("build/#{region}")
+    fs.writeFileSync("build/#{region}/data.json", JSON.stringify(db))
+    console.log("done", region)
 
 
 compileOsm = (bbox, osm, dem) ->
