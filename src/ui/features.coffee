@@ -95,13 +95,13 @@ app.features = (options) ->
       x = d3.round(xyproj[0])
       y = d3.round(xyproj[1])
       if x > 0 and x < map.width and y > 0 and y < map.height
-        if app.symbol[poi.properties.type]
+        if (symbolType = app.symbol[poi.properties.type])?
           symbol = {
             properties: poi.properties
             x: x
             y: y
-            hw: 6.5
-            hh: 6.5
+            hw: symbolType.mask.hw
+            hh: symbolType.mask.hh
           }
           symbolList.push(symbol)
 
@@ -140,11 +140,11 @@ app.features = (options) ->
     for symbol in symbolList
       continue if symbol.segmentSymbol
       size = symbol.properties.labelSize
-      offset = app.symbol[symbol.properties.type].labelOffset
+      mask = app.symbol[symbol.properties.type].mask
       thw = size.w / 2
       thh = size.h / 2
-      tx = symbol.x + offset[0] + thw
-      ty = symbol.y + offset[1] + thh
+      tx = symbol.x + mask.hw + thw + 1
+      ty = symbol.y + mask.hh - 2 * thh
       unless collides(tx, ty, thw, thh)
         if (name = symbol.properties.name)?
           g = symbols.append('g')

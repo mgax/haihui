@@ -102,7 +102,7 @@ app.symbol.alpine_hut = (selection) ->
       .attr('class', 'symbol-alpine_hut')
       .attr('d', "M-2,-5 L11,1 L7,1 L7,5 L-7,5 L-7,1 L-11,1 L-2,-5")
 
-app.symbol.alpine_hut.labelOffset = [10, -14]
+app.symbol.alpine_hut.mask = {hw: 7, hh: 5}
 
 app.symbol.chalet = app.symbol.alpine_hut
 app.symbol.hotel = app.symbol.alpine_hut
@@ -113,7 +113,7 @@ app.symbol.basic_hut = (selection) ->
       .attr('class', 'symbol-basic_hut')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
-app.symbol.basic_hut.labelOffset = [10, -14]
+app.symbol.basic_hut.mask = {hw: 7, hh: 5}
 
 
 app.symbol.peak = (selection) ->
@@ -121,7 +121,7 @@ app.symbol.peak = (selection) ->
       .attr('class', 'symbol-peak')
       .attr('d', "M0,-4 L5,4 L-5,4 L0,-4")
 
-app.symbol.peak.labelOffset = [7, -12]
+app.symbol.peak.mask = {hw: 5, hh: 4}
 
 
 app.symbol.saddle = (selection) ->
@@ -129,7 +129,7 @@ app.symbol.saddle = (selection) ->
       .attr('class', 'symbol-saddle')
       .attr('d', "M0,0 L6,-4 L6,4 L-6,4 L-6,-4 L0,0")
 
-app.symbol.saddle.labelOffset = [7, -12]
+app.symbol.saddle.mask = {hw: 6, hh: 4}
 
 
 app.symbol.locationbutton = (selection) ->
