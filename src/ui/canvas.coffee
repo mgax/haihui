@@ -1,6 +1,7 @@
 app.canvas = (options) ->
   map = options.map
   bbox = map.db.bbox
+  map.debug.coordinates = false
 
   extent = {
     w: d3.max([-bbox[0], bbox[2]]) * 2
@@ -117,6 +118,12 @@ app.canvas = (options) ->
                      transform: #{transform}"
 
     mapLayer.attr('style', style)
+
+    if map.debug.coordinates
+      uiLayer.on 'mousemove', ->
+        console.log(proj.inverse(projection.invert([d3.event.x, d3.event.y])))
+    else
+      uiLayer.on 'mousemove', ->
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
