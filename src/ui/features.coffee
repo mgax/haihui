@@ -25,7 +25,9 @@ app.features = (options) ->
         segment.properties.symbols = [] unless segment.properties.symbols?
         segment.properties.symbols.push(route.symbol)
 
-  labelWidthG = symbols.append('g').attr('transform', "translate(0,-100)")
+  labelWidthG = symbols.append('g')
+      .attr('class', 'symbolLabel')
+      .attr('tarnsform', 'translate(0,-100)')
   app.symbol.calculateLabelWidth(labelWidthG, poiLayer)
   labelWidthG.remove()
 
@@ -63,6 +65,7 @@ app.features = (options) ->
         .attr('d', map.path)
 
     symbols.selectAll('.symbol').remove()
+    symbols.selectAll('.symbolLabel').remove()
 
     interval = 80 / map.sc
     symbolList = []
@@ -82,6 +85,8 @@ app.features = (options) ->
                 properties: point.properties
                 x: x
                 y: y
+                hw: 6.5 * segment.properties.symbols.length
+                hh: 6.5
               }
               symbolList.push(symbol)
 
@@ -91,7 +96,13 @@ app.features = (options) ->
       y = d3.round(xyproj[1])
       if x > 0 and x < map.width and y > 0 and y < map.height
         if app.symbol[poi.properties.type]
-          symbol = {properties: poi.properties, x: x, y: y}
+          symbol = {
+            properties: poi.properties
+            x: x
+            y: y
+            hw: 6.5
+            hh: 6.5
+          }
           symbolList.push(symbol)
 
     symbols.selectAll('.symbol')
@@ -100,6 +111,47 @@ app.features = (options) ->
         .attr('class', 'symbol')
         .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each(app.symbol.render)
+
+    qt = (d3.geom.quadtree()
+        .extent([[0, 0], [map.width, map.height]])
+        .x (d) -> d.x
+        .y (d) -> d.y
+        )(symbolList)
+
+    # search distance
+    sw = d3.max(symbolList, (s) -> s.hw)
+    sh = d3.max(symbolList, (s) -> s.hh)
+
+    collides = (x, y, hw, hh) ->
+      tx1 = x - hw - sw
+      ty1 = y - hh - sh
+      tx2 = x + hw + sw
+      ty2 = y + hh + sh
+      hit = false
+      qt.visit (quad, qx1, qy1, qx2, qy2) ->
+        if (point = quad.point)?
+          dx = Math.abs(point.x - x)
+          dy = Math.abs(point.y - y)
+          if dx < hw + point.hw and dy < hh + point.hh
+            hit = true
+        return qx1 > tx2 or qx2 < tx1 or qy1 > ty2 or qy2 < ty1
+      return hit
+
+    for symbol in symbolList
+      continue if symbol.segmentSymbol
+      size = symbol.properties.labelSize
+      offset = app.symbol[symbol.properties.type].labelOffset
+      thw = size.w / 2
+      thh = size.h / 2
+      tx = symbol.x + offset[0] + thw
+      ty = symbol.y + offset[1] + thh
+      unless collides(tx, ty, thw, thh)
+        if (name = symbol.properties.name)?
+          g = symbols.append('g')
+              .attr('class', 'symbolLabel')
+              .attr('transform', "translate(#{tx - thw},#{ty - thh - size.dy})")
+          app.symbol.textWithHalo(g, name)
+          qt.add(x: tx, y: ty, hw: thw, hh: thh, labelFor: symbol)
 
   map.dispatch.on 'redraw.features', ->
     render()

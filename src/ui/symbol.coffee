@@ -1,12 +1,11 @@
 app.symbol = {}
 
-textWithHalo = (label) ->
-  (selection) ->
-    selection.append('text')
-        .attr('class', 'halo')
-        .text(label)
-    selection.append('text')
-        .text(label)
+app.symbol.textWithHalo = (g, label) ->
+  g.append('text')
+      .attr('class', 'halo')
+      .text(label)
+  g.append('text')
+      .text(label)
 
 
 app.symbol.calculateLabelWidth = (g, poiLayer) ->
@@ -22,6 +21,7 @@ app.symbol.calculateLabelWidth = (g, poiLayer) ->
         d.properties.labelSize = {
           w: Math.ceil(bbox.width)
           h: Math.ceil(bbox.height)
+          dy: bbox.y
         }
 
 
@@ -102,9 +102,7 @@ app.symbol.alpine_hut = (selection) ->
       .attr('class', 'symbol-alpine_hut')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
-  selection.append('g')
-      .attr('transform', "translate(10,-2)")
-      .call(textWithHalo(selection.datum().properties.name))
+app.symbol.alpine_hut.labelOffset = [10, -14]
 
 app.symbol.chalet = app.symbol.alpine_hut
 app.symbol.hotel = app.symbol.alpine_hut
@@ -115,9 +113,7 @@ app.symbol.basic_hut = (selection) ->
       .attr('class', 'symbol-basic_hut')
       .attr('d', "M-2,-6 L11,0 L7,0 L7,4 L-7,4 L-7,0 L-11,0 L-2,-6")
 
-  selection.append('g')
-      .attr('transform', "translate(10,-2)")
-      .call(textWithHalo(selection.datum().properties.name))
+app.symbol.basic_hut.labelOffset = [10, -14]
 
 
 app.symbol.peak = (selection) ->
@@ -125,9 +121,7 @@ app.symbol.peak = (selection) ->
       .attr('class', 'symbol-peak')
       .attr('d', "M0,-5 L5,3 L-5,3 L0,-5")
 
-  selection.append('g')
-      .attr('transform', "translate(6,0)")
-      .call(textWithHalo(selection.datum().properties.name))
+app.symbol.peak.labelOffset = [7, -12]
 
 
 app.symbol.saddle = (selection) ->
@@ -135,9 +129,7 @@ app.symbol.saddle = (selection) ->
       .attr('class', 'symbol-saddle')
       .attr('d', "M0,2 L6,-2 L6,6 L-6,6 L-6,-2 L0,2")
 
-  selection.append('g')
-      .attr('transform', "translate(6,0)")
-      .call(textWithHalo(selection.datum().properties.name))
+app.symbol.saddle.labelOffset = [7, -12]
 
 
 app.symbol.locationbutton = (selection) ->
