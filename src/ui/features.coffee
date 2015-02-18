@@ -70,21 +70,21 @@ app.features = (options) ->
       length = segment.properties.length
       for n in d3.range(0, d3.round(length / interval))
         point = app.along(segment.geometry.coordinates, interval * (n + 0.5))
-        point.properties = {symbols: segment.properties.symbols}
-        if app.inside(point.geometry.coordinates, db.bbox)
-          xyproj = map.projection(point.geometry.coordinates)
-          x = d3.round(xyproj[0])
-          y = d3.round(xyproj[1])
-          if app.inside([x, y], [0, 0, map.width, map.height])
-            symbol = {properties: point.properties, x: x, y: y}
-            segmentSymbols.push(symbol)
+        if segment.properties.symbols
+          point.properties = {symbols: segment.properties.symbols}
+          if app.inside(point.geometry.coordinates, db.bbox)
+            xyproj = map.projection(point.geometry.coordinates)
+            x = d3.round(xyproj[0])
+            y = d3.round(xyproj[1])
+            if app.inside([x, y], [0, 0, map.width, map.height])
+              symbol = {properties: point.properties, x: x, y: y}
+              segmentSymbols.push(symbol)
 
     symbols.selectAll('.segmentSymbol').data(segmentSymbols)
       .enter().append('g')
         .attr('class', 'symbol segmentSymbol')
         .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each (d) ->
-          return unless d.properties.symbols
           for i in d3.range(0, d.properties.symbols.length)
             dx = - d3.round(13 / 2 * (d.properties.symbols.length - 1))
             g = d3.select(@).append('g')
@@ -97,16 +97,16 @@ app.features = (options) ->
       x = d3.round(xyproj[0])
       y = d3.round(xyproj[1])
       if x > 0 and x < map.width and y > 0 and y < map.height
-        symbol = {properties: poi.properties, x: x, y: y}
-        poiSymbols.push(symbol)
+        if app.symbol[poi.properties.type]
+          symbol = {properties: poi.properties, x: x, y: y}
+          poiSymbols.push(symbol)
 
     symbols.selectAll('.poiSymbol').data(poiSymbols)
       .enter().append('g')
         .attr('class', 'symbol poiSymbol')
         .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each (poi) ->
-          if (drawSymbol = app.symbol[poi.properties.type])?
-            drawSymbol(d3.select(@))
+          app.symbol[poi.properties.type](d3.select(@))
 
   map.dispatch.on 'redraw.features', ->
     render()
