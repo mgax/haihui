@@ -30,11 +30,16 @@ SLEEPING_PLACE = {
 }
 
 
-exec = (cmd) ->
+exec = (cmd, stdin='') ->
   done = Q.defer()
+  stdout = ''
   console.log cmd
-  child_process.exec cmd, done.resolve
-  return done.promise
+  child = child_process.exec(cmd, done.resolve)
+  child.stdout.on('data', (data) -> stdout += data)
+  child.stdin.end(stdin)
+
+  done.promise.then ->
+    stdout
 
 
 httpGet = (url) ->
@@ -233,24 +238,41 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'way' and (o.tags.water == 'lake' or o.tags.water == 'reservoir')
       lakes.push(lake(o))
 
-  layers = {
-    segments: turf.featurecollection(segment(id) for id in segmentIds.values())
-    poi: turf.featurecollection(poi)
-    highways: turf.featurecollection(highways)
-    rivers: turf.featurecollection(rivers)
-    lakes: turf.featurecollection(lakes)
-  }
+  altitudeList(poi.map((p) -> projection.inverse(p.geometry.coordinates)))
 
-  return {
-    topo: topojson.topology(layers, {
-      quantization: 1000000
-      'property-transform': (f) -> f.properties
-    })
-    dem: dem
-    routes: route(obj[id]) for id in routeIds.values()
-    bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
-    projParams: projParams
-  }
+  .then (rv) ->
+    rv.forEach (altitude, n) ->
+      poi[n].properties.altitude = altitude
+
+    poi.sort((a, b) -> a.properties.altitude - b.properties.altitude)
+
+    layers = {
+      segments: turf.featurecollection(segment(id) for id in segmentIds.values())
+      poi: turf.featurecollection(poi)
+      highways: turf.featurecollection(highways)
+      rivers: turf.featurecollection(rivers)
+      lakes: turf.featurecollection(lakes)
+    }
+
+    return {
+      topo: topojson.topology(layers, {
+        quantization: 1000000
+        'property-transform': (f) -> f.properties
+      })
+      dem: dem
+      routes: route(obj[id]) for id in routeIds.values()
+      bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
+      projParams: projParams
+    }
+
+
+altitudeList = (coordinateList) ->
+  input = coordinateList.map((p) -> "#{p[0]} #{p[1]}\n").join('')
+
+  exec("gdallocationinfo -wgs84 -valonly data/srtm-1arcsec-ro.tiff", input)
+
+  .then (out) ->
+    return out.trim().split("\n").map((line) -> +line)
 
 
 data.dem = (region) ->
