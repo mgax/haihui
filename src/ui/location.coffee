@@ -32,7 +32,7 @@ app.location = (options) ->
         switch locationMode
           when LOCATION_OFF
             locationMode = LOCATION_SHOW
-            locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide)
+            locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide, enableHighAccuracy: true)
             locationbuttong.classed('locating', true)
 
           when LOCATION_SHOW
