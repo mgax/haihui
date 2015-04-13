@@ -30,6 +30,7 @@ SLEEPING_PLACE = {
 }
 
 MAXBUFFER = 1024 * 1024 * 64  # 64MB
+SAVERAW = process.env.SAVERAW
 
 
 exec = (cmd, stdin='') ->
@@ -109,8 +110,17 @@ data.build = (region) ->
     console.log("overpass:", q)
     httpGet(url)
 
-  .then (body) ->
-    p = JSON.parse(body)
+  .then (resp) ->
+    if SAVERAW?
+      return exec('python -m json.tool', resp).then (prettyResp) ->
+        fs.writeFileSync("#{SAVERAW}/#{region}.json", prettyResp)
+        return resp
+
+    else
+      return resp
+
+  .then (resp) ->
+    p = JSON.parse(resp)
     compileOsm(bbox, p, dem)
 
   .then (db) ->
