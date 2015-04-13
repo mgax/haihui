@@ -29,17 +29,20 @@ SLEEPING_PLACE = {
   'hotel': true
 }
 
+MAXBUFFER = 1024 * 1024 * 64  # 64MB
+
 
 exec = (cmd, stdin='') ->
   done = Q.defer()
-  stdout = ''
   console.log cmd
-  child = child_process.exec(cmd, done.resolve)
-  child.stdout.on('data', (data) -> stdout += data)
+  exec_cb = (err, data) ->
+    if err?
+      done.reject(err)
+    else
+      done.resolve(data)
+  child = child_process.exec(cmd, maxBuffer: MAXBUFFER, exec_cb)
   child.stdin.end(stdin)
-
-  done.promise.then ->
-    stdout
+  return done.promise
 
 
 httpGet = (url) ->
