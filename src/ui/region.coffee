@@ -9,6 +9,7 @@ initialize = (db) ->
   }
 
   topojson.presimplify(db.topo)
+  topojson.presimplify(db.land)
   topojson.presimplify(db.dem)
 
   canvas = app.canvas(map: map)
@@ -43,7 +44,8 @@ initialize = (db) ->
 
   app.features(
     map: map
-    g: canvas.features
+    featuresG: canvas.features
+    landG: canvas.land
     symbols: canvas.symbols
   )
 

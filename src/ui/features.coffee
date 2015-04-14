@@ -3,10 +3,11 @@ app.features = (options) ->
   db = map.db
   map.debug.collisions = false
 
-  lakes = options.g.append('g')
-  rivers = options.g.append('g')
-  highways = options.g.append('g')
-  segments = options.g.append('g')
+  land = options.landG.append('g')
+  lakes = options.featuresG.append('g')
+  rivers = options.featuresG.append('g')
+  highways = options.featuresG.append('g')
+  segments = options.featuresG.append('g')
   symbols = options.symbols
 
   lakesLayer = topojson.feature(db.topo, db.topo.objects.lakes).features
@@ -18,6 +19,8 @@ app.features = (options) ->
   poiLayer = topojson.feature(db.topo, db.topo.objects.poi).features
   riversLayer = topojson.feature(db.topo, db.topo.objects.rivers).features
   highwaysLayer = topojson.feature(db.topo, db.topo.objects.highways).features
+
+  landLayer = topojson.feature(db.land, db.land.objects.land).features
 
   for route in db.routes
     for id in route.segments
@@ -31,6 +34,12 @@ app.features = (options) ->
       .attr('tarnsform', 'translate(0,-100)')
   app.symbol.calculateLabelWidth(labelWidthG, poiLayer)
   labelWidthG.remove()
+
+  land.selectAll('.landPoly')
+      .data(landLayer)
+    .enter().append('path')
+      .attr('class', (d) -> "landPoly land-#{d.properties.type}")
+      .attr('id', (d) -> d.id)
 
   segments.selectAll('.segment')
       .data(segmentLayer)
@@ -53,6 +62,9 @@ app.features = (options) ->
       .attr('class', (d) -> "highway highway-#{d.properties.grade}")
 
   render = ->
+    land.selectAll('.landPoly')
+        .attr('d', map.path)
+
     segments.selectAll('.segment')
         .attr('d', map.path)
 
