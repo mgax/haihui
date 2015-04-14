@@ -333,10 +333,10 @@ compileOsm = (bbox, osm, dem) ->
         quantization: 1000000
         'property-transform': (f) -> f.properties
       })
-      land: topojson.topology({land: turf.featurecollection(land)}, {
+      land: topojson.simplify(topojson.topology({land: turf.featurecollection(land)}, {
         quantization: 1000000
         'property-transform': (f) -> f.properties
-      })
+      }), 'minimum-area': 200, 'coordinate-system': 'cartesian')
       dem: dem
       routes: route(obj[id]) for id in routeIds.values()
       bbox: [].concat(project(bbox.slice(0, 2)), project(bbox.slice(2, 4)))
