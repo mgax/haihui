@@ -25,6 +25,18 @@ app.symbol.calculateLabelWidth = (g, poiLayer) ->
         }
 
 
+app.symbol.defs = (defs) ->
+  marsh = defs.append('pattern')
+      .attr('id', 'symbol-marsh')
+      .attr('width', 15)
+      .attr('height', 15)
+      .attr('patternUnits', 'userSpaceOnUse')
+
+  marsh.append('path')
+      .attr('class', 'marsh-line')
+      .attr('d', "M0,.5 L8,.5 M6,8.5 L14,8.5")
+
+
 app.symbol.render = (symbol) ->
   if symbol.segmentSymbol
     app.symbol.segmentSymbol(symbol, d3.select(@))

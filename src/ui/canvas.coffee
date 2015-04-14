@@ -47,6 +47,8 @@ app.canvas = (options) ->
   mapLayer = d3.select('body').append('svg').attr('class', 'mapLayer')
   uiLayer = d3.select('body').append('svg').attr('class', 'uiLayer')
 
+  app.symbol.defs(mapLayer.append('defs'))
+
   canvas = {}
   canvas.land = mapLayer.append('g')
   canvas.contours = mapLayer.append('g')

@@ -30,17 +30,6 @@ SLEEPING_PLACE = {
   'hotel': true
 }
 
-LAND =
-  natural:
-    'heath': 'heath'
-    'wood': 'forest'
-  landuse:
-    'farmland': 'farmland'
-    'forest': 'forest'
-    'grass': 'grass'
-    'meadow': 'meadow'
-    'residential': 'residential'
-
 MAXBUFFER = 1024 * 1024 * 64  # 64MB
 SAVERAW = process.env.SAVERAW
 
@@ -87,6 +76,27 @@ albersProj = (param) ->
   return "+proj=aea +x0=0 +y0=0 +units=m +no_defs
           +lat_1=#{param.lat_1} +lat_2=#{param.lat_2}
           +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
+
+
+landuseType = (obj) ->
+  switch obj.tags.natural
+    when 'heath'        then return 'heath'
+    when 'rock'         then return 'rock'
+    when 'scrub'        then return 'scrub'
+    when 'wood'         then return 'forest'
+    when 'wetland'
+      switch obj.tags.wetland
+        when 'marsh'    then return 'marsh'
+
+  switch obj.tags.landuse
+    when 'farmland'     then return 'farmland'
+    when 'forest'       then return 'forest'
+    when 'grass'        then return 'grass'
+    when 'industrial'   then return 'industrial'
+    when 'meadow'       then return 'meadow'
+    when 'orchard'      then return 'orchard'
+    when 'quarry'       then return 'quarry'
+    when 'residential'  then return 'residential'
 
 
 query = (bbox) ->
@@ -244,7 +254,7 @@ compileOsm = (bbox, osm, dem) ->
     return f
 
   landFeature = (obj) ->
-    type = LAND.natural[obj.tags.natural] or LAND.landuse[obj.tags.landuse]
+    type = landuseType(obj)
     buffer = turf.buffer(osmFeature[obj.type + '/' + obj.id], 0, 'meters')
     f = turf.intersect(bboxPoly, buffer.features[0])
     projectCoord(f.geometry.coordinates)
@@ -296,7 +306,7 @@ compileOsm = (bbox, osm, dem) ->
       lakes.push(lake(o))
 
     if o.type == 'way' or o.type == 'relation'
-      if LAND.natural[o.tags.natural] or LAND.landuse[o.tags.landuse]
+      if landuseType(o)?
         try
           f = landFeature(o)
         catch e then continue
