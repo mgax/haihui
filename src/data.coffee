@@ -5,6 +5,7 @@ request = require('request')
 topojson = require('topojson')
 turf = require('turf')
 proj4 = require('proj4')
+osmtogeojson = require('osmtogeojson')
 crypto = require('crypto')
 Q = require('q')
 
@@ -28,6 +29,17 @@ SLEEPING_PLACE = {
   'alpine_hut': true
   'hotel': true
 }
+
+LAND =
+  natural:
+    'heath': 'heath'
+    'wood': 'forest'
+  landuse:
+    'farmland': 'farmland'
+    'forest': 'forest'
+    'grass': 'grass'
+    'meadow': 'meadow'
+    'residential': 'residential'
 
 MAXBUFFER = 1024 * 1024 * 64  # 64MB
 SAVERAW = process.env.SAVERAW
@@ -89,6 +101,10 @@ query = (bbox) ->
     'way["water"="reservoir"]'
     'node["tourism"~""]'
     'way["tourism"~""]'
+    'way["landuse"~""]'
+    'relation["landuse"~""]'
+    'way["natural"~""]'
+    'relation["natural"~""]'
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f}(#{overpassBbox});"
@@ -137,6 +153,7 @@ compileOsm = (bbox, osm, dem) ->
   highways = []
   rivers = []
   lakes = []
+  land = []
 
   projParams = albersProj(albers(bbox))
   projection = proj4(projParams)
@@ -150,6 +167,24 @@ compileOsm = (bbox, osm, dem) ->
   linestring = (nodes) -> turf.linestring(projectNode(obj[n]) for n in nodes)
 
   polygon = (nodes) -> turf.polygon([projectNode(obj[n]) for n in nodes])
+
+  bboxPoly = turf.polygon([[
+    [bbox[0], bbox[1]]
+    [bbox[0], bbox[3]]
+    [bbox[2], bbox[3]]
+    [bbox[2], bbox[1]]
+    [bbox[0], bbox[1]]
+  ]])
+
+  projectCoord = (coord) ->
+    if typeof(coord[0]) == 'number'
+      [coord[0], coord[1]] = project(coord)
+    else
+      coord.map(projectCoord)
+
+  osmFeature = {}
+  osmtogeojson(osm).features.forEach (feature) ->
+    osmFeature[feature.id] = feature
 
   segment = (id) ->
     f = linestring(obj[id].nodes)
@@ -208,6 +243,15 @@ compileOsm = (bbox, osm, dem) ->
     f.properties = {name: obj.tags.name}
     return f
 
+  landFeature = (obj) ->
+    type = LAND.natural[obj.tags.natural] or LAND.landuse[obj.tags.landuse]
+    buffer = turf.buffer(osmFeature[obj.type + '/' + obj.id], 0, 'meters')
+    f = turf.intersect(bboxPoly, buffer.features[0])
+    projectCoord(f.geometry.coordinates)
+    f.id = "#{obj.type}/#{obj.id}"
+    f.properties = {type: type}
+    return f
+
   route = (relation) ->
     segments = []
     for m in relation.members
@@ -251,6 +295,13 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'way' and (o.tags.water == 'lake' or o.tags.water == 'reservoir')
       lakes.push(lake(o))
 
+    if o.type == 'way' or o.type == 'relation'
+      if LAND.natural[o.tags.natural] or LAND.landuse[o.tags.landuse]
+        try
+          f = landFeature(o)
+        catch e then continue
+        land.push(f)
+
   altitudeList(poi.map((p) -> projection.inverse(p.geometry.coordinates)))
 
   .then (rv) ->
@@ -269,6 +320,10 @@ compileOsm = (bbox, osm, dem) ->
 
     return {
       topo: topojson.topology(layers, {
+        quantization: 1000000
+        'property-transform': (f) -> f.properties
+      })
+      land: topojson.topology({land: turf.featurecollection(land)}, {
         quantization: 1000000
         'property-transform': (f) -> f.properties
       })
