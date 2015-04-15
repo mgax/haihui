@@ -146,8 +146,17 @@ app.symbol.saddle.mask = {hw: 6, hh: 4}
 
 app.symbol.locationbutton = (selection) ->
   selection.append('path')
+      .attr('class', 'arrow')
       .attr('d', "M6,-6 L0,6 L0,0 L-6,0 L6,-6")
 
   selection.append('circle')
       .attr('class', 'track')
       .attr('r', 10)
+
+  selection.selectAll('.dot')
+      .data([-6, 0, 6])
+    .enter().append('circle')
+      .attr('class', 'dot')
+      .attr('r', 2)
+      .attr('cx', (d) -> d)
+      .attr('cy', 4)

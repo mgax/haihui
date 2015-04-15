@@ -125,13 +125,13 @@ html, body {
 .location {
     .midpoint {
         fill: #1382C7;
-        fill-opacity: .5;
+        fill-opacity: .6;
         stroke: #1382C7;
     }
 
     .accuracy {
         fill: #1382C7;
-        opacity: .2;
+        opacity: .3;
     }
 }
 
@@ -159,21 +159,27 @@ html, body {
         pointer-events: all;
     }
 
-    .symbol-locationbutton {
-        path {
-            fill: #888;
-            .locating& {
-                fill: #07f;
-            }
+    .arrow {
+        fill: #888;
+        .showing& {
+            fill: #07f;
         }
+    }
 
-        .track {
-            fill: none;
-            stroke: none;
+    .dot {
+        fill: none;
 
-            .tracking& {
-                stroke: #07f;
-            }
+        .waiting& {
+            fill: #333;
+        }
+    }
+
+    .track {
+        fill: none;
+        stroke: none;
+
+        .tracking& {
+            stroke: #07f;
         }
     }
 }

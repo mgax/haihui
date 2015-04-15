@@ -1,15 +1,16 @@
 ACCURACY_LIMIT = 1000  # 1km
 LOCATION_OFF = 0
-LOCATION_SHOW = 1
-LOCATION_TRACK = 2
+LOCATION_WAIT = 1
+LOCATION_SHOW = 2
+LOCATION_TRACK = 3
 
 app.location = (options) ->
   map = options.map
   locationg = options.locationg
-  locationbuttong = options.locationbuttong
+  button = options.locationbuttong
 
   location = null
-  locationMode = LOCATION_OFF
+  locationMode = null
   locationWatch = null
 
   locationg.append('circle')
@@ -19,35 +20,43 @@ app.location = (options) ->
   locationg.append('circle')
       .attr('class', 'accuracy')
 
-  locationbuttong.append('g')
-      .attr('class', 'symbol-locationbutton')
+  setMode = (mode) ->
+    locationMode = mode
+    button.attr 'class', switch locationMode
+      when LOCATION_OFF   then 'locationbutton'
+      when LOCATION_WAIT  then 'locationbutton waiting'
+      when LOCATION_SHOW  then 'locationbutton showing'
+      when LOCATION_TRACK then 'locationbutton showing tracking'
 
-  locationbuttong.append('rect')
+  setMode(LOCATION_OFF)
+
+  button.append('rect')
       .attr('class', 'buttonmask')
       .attr('x', -15)
       .attr('y', -15)
       .attr('width', 30)
       .attr('height', 30)
-      .on 'click', ->
-        switch locationMode
-          when LOCATION_OFF
-            locationMode = LOCATION_SHOW
-            locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide, enableHighAccuracy: true)
-            locationbuttong.classed('locating', true)
 
-          when LOCATION_SHOW
-            locationMode = LOCATION_TRACK
-            locationbuttong.classed('tracking', true)
-            positionUpdate()
+  button.on 'click', ->
+      switch locationMode
+        when LOCATION_OFF
+          setMode(LOCATION_WAIT)
+          locationWatch = navigator.geolocation.watchPosition(positionOk, positionHide, enableHighAccuracy: true)
 
-          when LOCATION_TRACK
-            locationMode = LOCATION_OFF
-            locationbuttong.classed('tracking', false)
-            locationbuttong.classed('locating', false)
-            navigator.geolocation.clearWatch(locationWatch)
-            positionHide()
+        when LOCATION_WAIT
+          setMode(LOCATION_OFF)
+          navigator.geolocation.clearWatch(locationWatch)
 
-  app.symbol.locationbutton(locationbuttong.select('.symbol-locationbutton'))
+        when LOCATION_SHOW
+          setMode(LOCATION_TRACK)
+          positionUpdate()
+
+        when LOCATION_TRACK
+          setMode(LOCATION_OFF)
+          navigator.geolocation.clearWatch(locationWatch)
+          positionHide()
+
+  app.symbol.locationbutton(button)
 
   showLocation = () ->
     unless location?
@@ -77,11 +86,16 @@ app.location = (options) ->
       pos: [coords.longitude, coords.latitude]
       accuracy: coords.accuracy
     }
-    positionUpdate()
 
-  positionUpdate = ->
+    center = false
+    if locationMode == LOCATION_WAIT
+      setMode(LOCATION_SHOW)
+      center = true
+    positionUpdate(center)
+
+  positionUpdate = (center) ->
     showLocation()
-    if locationMode == LOCATION_TRACK and location
+    if (locationMode == LOCATION_TRACK or center) and location
       point = map.wgsProjection(location.pos)
       if app.inside(point, map.db.bbox)
         scaleTarget = d3.min([map.width, map.height]) / 3 / location.accuracy
@@ -90,8 +104,7 @@ app.location = (options) ->
 
   positionDisableTracking = ->
     if locationMode == LOCATION_TRACK
-      locationMode = LOCATION_SHOW
-      locationbuttong.classed('tracking', false)
+      setMode(LOCATION_SHOW)
 
   positionHide = ->
     location = null
