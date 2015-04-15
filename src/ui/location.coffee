@@ -62,8 +62,10 @@ app.location = (options) ->
         .attr('r', location.accuracy * map.sc)
 
   map.dispatch.on 'zoom.location', ->
-    showLocation()
     positionDisableTracking()
+
+  map.dispatch.on 'zoomend.location', ->
+    showLocation()
 
   map.dispatch.on 'redraw.location', ->
     showLocation()
