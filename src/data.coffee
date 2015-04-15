@@ -55,6 +55,10 @@ exec = (cmd, stdin='') ->
   return done.promise
 
 
+execSync = (cmd, stdin='') ->
+  child_process.execSync(cmd, input: stdin, maxBuffer: MAXBUFFER)
+
+
 httpGet = (url) ->
   deferred = Q.defer()
   request url, (err, res, body) ->
@@ -67,6 +71,22 @@ httpGet = (url) ->
 
 ensureDir = (path) ->
   fs.mkdirSync(path) unless fs.existsSync(path)
+
+
+closeRings = (feature) ->
+  closeRing = (ring) ->
+    first = ring[0]
+    last = ring[ring.length-1]
+    unless first[0] == last[0] and first[1] == last[1]
+      console.log "Closing ring at #{first}"
+      ring.push(first)
+
+  if feature.geometry.type == 'Polygon'
+    feature.geometry.coordinates.forEach(closeRing)
+
+
+buffer = (geometry) ->
+  JSON.parse(execSync('python src/buffer.py', JSON.stringify(geometry)))
 
 
 albers = (bbox) ->
@@ -268,8 +288,14 @@ compileOsm = (bbox, osm, dem) ->
 
   landFeature = (o) ->
     type = landuseType(o)
-    buffer = turf.buffer(osmFeature[o.type + '/' + o.id], 0, 'meters')
-    f = turf.intersect(bboxPoly, buffer.features[0])
+    f = osmFeature[osmid(o)]
+    closeRings(f)
+    try
+      f = turf.intersect(bboxPoly, f)
+    catch e
+      console.log "#{f.id} error during intersection (#{e}), buffering"
+      f.geometry = buffer(f.geometry)
+      f = turf.intersect(bboxPoly, f)
     projectCoord(f.geometry.coordinates)
     f.id = osmid(o)
     f.properties = {type: type}
@@ -321,10 +347,7 @@ compileOsm = (bbox, osm, dem) ->
 
     if o.type == 'way' or o.type == 'relation'
       if landuseType(o)?
-        try
-          f = landFeature(o)
-        catch e then continue
-        land.push(f)
+        land.push(landFeature(o))
 
   altitudeList(poi.map((p) -> projection.inverse(p.geometry.coordinates)))
 
