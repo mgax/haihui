@@ -14,11 +14,6 @@ initialize = (db) ->
 
   canvas = app.canvas(map: map)
 
-  canvas.actionbar.append('rect')
-      .attr('class', 'background')
-      .attr('height', '100%')
-      .attr('width', '100%')
-
   actionbarRight = canvas.actionbar.append('g')
 
   scaleg = actionbarRight.append('g')
