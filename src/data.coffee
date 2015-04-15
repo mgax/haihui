@@ -8,6 +8,7 @@ proj4 = require('proj4')
 osmtogeojson = require('osmtogeojson')
 crypto = require('crypto')
 Q = require('q')
+Handlebars = require('handlebars')
 
 data = module.exports = {}
 
@@ -35,6 +36,10 @@ SAVERAW = process.env.SAVERAW
 
 
 osmid = (o) -> "#{o.type}/#{o.id}"
+
+
+template = (name) ->
+  Handlebars.compile(fs.readFileSync("templates/#{name}", encoding: 'utf-8'))
 
 
 exec = (cmd, stdin='') ->
@@ -409,16 +414,8 @@ data.dem = (region) ->
   return buildDem()
 
 
-data.html = ->
-  Handlebars = require('handlebars')
-  template = (name) ->
-    Handlebars.compile(fs.readFileSync("templates/#{name}", encoding: 'utf-8'))
-
-  index_html = template('index.html')
-  region_html = template('region.html')
+htmlManifest = (directory, fileNameList) ->
   manifest_appcache = template('manifest.appcache')
-
-  regions = Object.keys(data.REGION).sort()
 
   checksum = (filePath) ->
     hash = crypto.createHash('sha1')
@@ -427,40 +424,52 @@ data.html = ->
     hash.update(fs.readFileSync(filePath))
     return hash.digest('hex')
 
-  manifest = (directory, fileNameList) ->
-    fileList = fileNameList.map (name) -> {
-      name: name
-      checksum: checksum("#{directory}/#{name}")
-    }
-    return manifest_appcache(fileList: fileList)
+  fileList = fileNameList.map (name) -> {
+    name: name
+    checksum: checksum("#{directory}/#{name}")
+  }
+  return manifest_appcache(fileList: fileList)
 
-  for region in regions
-    ensureDir("build/#{region}")
-    fs.writeFileSync(
-      "build/#{region}/index.html",
-      region_html(title: data.REGION[region].title)
-    )
-    region_manifest = manifest("build/#{region}", [
-      './'
-      '../region.css'
-      '../d3.min.js'
-      '../topojson.min.js'
-      '../proj4.js'
-      '../ui.js'
-      './data.json'
-    ])
-    fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
 
+data.htmlGlobal = ->
+  index_html = template('index.html')
+
+  regions = Object.keys(data.REGION).sort()
   regionList = ({slug: r, title: data.REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
-  index_manifest = manifest("build", [
+  fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
+  index_manifest = htmlManifest("build", [
     './'
     './screenshot.jpg'
     './bootstrap.min.css'
   ])
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
-  fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
+
+data.htmlRegion = (region) ->
+  region_html = template('region.html')
+
+  ensureDir("build/#{region}")
+  fs.writeFileSync(
+    "build/#{region}/index.html",
+    region_html(title: data.REGION[region].title)
+  )
+  region_manifest = htmlManifest("build/#{region}", [
+    './'
+    '../region.css'
+    '../d3.min.js'
+    '../topojson.min.js'
+    '../proj4.js'
+    '../ui.js'
+    './data.json'
+  ])
+  fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
+
+
+data.html = ->
+  data.htmlGlobal()
+  for region in Object.keys(data.REGION).sort()
+    data.htmlRegion(region)
 
 
 projectionError = (def, bbox, lng, lat) ->
