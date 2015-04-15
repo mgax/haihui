@@ -78,17 +78,17 @@ albersProj = (param) ->
           +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
 
 
-landuseType = (obj) ->
-  switch obj.tags.natural
+landuseType = (o) ->
+  switch o.tags.natural
     when 'heath'        then return 'heath'
     when 'rock'         then return 'rock'
     when 'scrub'        then return 'scrub'
     when 'wood'         then return 'forest'
     when 'wetland'
-      switch obj.tags.wetland
+      switch o.tags.wetland
         when 'marsh'    then return 'marsh'
 
-  switch obj.tags.landuse
+  switch o.tags.landuse
     when 'farmland'     then return 'farmland'
     when 'forest'       then return 'forest'
     when 'grass'        then return 'grass'
@@ -210,31 +210,31 @@ compileOsm = (bbox, osm, dem) ->
     }
     return f
 
-  tourism = (obj) ->
-    switch obj.type
+  tourism = (o) ->
+    switch o.type
       when 'node'
-        f = point(obj)
+        f = point(o)
       when 'way'
-        f = turf.centroid(segment(obj.id))
-    f.id = obj.id
+        f = turf.centroid(segment(o.id))
+    f.id = o.id
     f.properties = {
-      name: obj.tags.name
-      type: obj.tags.tourism
+      name: o.tags.name
+      type: o.tags.tourism
     }
     return f
 
-  shelter = (obj) ->
-    f = point(obj)
-    f.id = obj.id
+  shelter = (o) ->
+    f = point(o)
+    f.id = o.id
     f.properties = {
-      name: obj.tags.name
+      name: o.tags.name
       type: 'basic_hut'
     }
     return f
 
-  highway = (obj) ->
-    f = linestring(obj.nodes)
-    grade = switch obj.tags.highway
+  highway = (o) ->
+    f = linestring(o.nodes)
+    grade = switch o.tags.highway
       when 'track' then 'path'
       when 'path' then 'path'
       when 'footway' then 'path'
@@ -245,20 +245,20 @@ compileOsm = (bbox, osm, dem) ->
     f.properties = {grade: grade}
     return f
 
-  river = (obj) ->
-    linestring(obj.nodes)
+  river = (o) ->
+    linestring(o.nodes)
 
-  lake = (obj) ->
-    f = polygon(obj.nodes)
-    f.properties = {name: obj.tags.name}
+  lake = (o) ->
+    f = polygon(o.nodes)
+    f.properties = {name: o.tags.name}
     return f
 
-  landFeature = (obj) ->
-    type = landuseType(obj)
-    buffer = turf.buffer(osmFeature[obj.type + '/' + obj.id], 0, 'meters')
+  landFeature = (o) ->
+    type = landuseType(o)
+    buffer = turf.buffer(osmFeature[o.type + '/' + o.id], 0, 'meters')
     f = turf.intersect(bboxPoly, buffer.features[0])
     projectCoord(f.geometry.coordinates)
-    f.id = "#{obj.type}/#{obj.id}"
+    f.id = "#{o.type}/#{o.id}"
     f.properties = {type: type}
     return f
 
