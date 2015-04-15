@@ -201,12 +201,12 @@ compileOsm = (bbox, osm, dem) ->
 
   segment = (id) ->
     f = linestring(obj[id].nodes)
-    f.id = id.split('/')[1]
+    f.id = id
     return f
 
   natural = (node) ->
     f = point(node)
-    f.id = node.id
+    f.id = osmid(node)
     f.properties = {
       name: node.tags.name
       type: node.tags.natural
@@ -219,7 +219,7 @@ compileOsm = (bbox, osm, dem) ->
         f = point(o)
       when 'way'
         f = turf.centroid(segment(osmid(o)))
-    f.id = o.id
+    f.id = osmid(o)
     f.properties = {
       name: o.tags.name
       type: o.tags.tourism
@@ -228,7 +228,7 @@ compileOsm = (bbox, osm, dem) ->
 
   shelter = (o) ->
     f = point(o)
-    f.id = o.id
+    f.id = osmid(o)
     f.properties = {
       name: o.tags.name
       type: 'basic_hut'
@@ -237,6 +237,7 @@ compileOsm = (bbox, osm, dem) ->
 
   highway = (o) ->
     f = linestring(o.nodes)
+    f.id = osmid(o)
     grade = switch o.tags.highway
       when 'track' then 'path'
       when 'path' then 'path'
@@ -249,10 +250,13 @@ compileOsm = (bbox, osm, dem) ->
     return f
 
   river = (o) ->
-    linestring(o.nodes)
+    f = linestring(o.nodes)
+    f.id = osmid(o)
+    return f
 
   lake = (o) ->
     f = polygon(o.nodes)
+    f.id = osmid(o)
     f.properties = {name: o.tags.name}
     return f
 
@@ -261,7 +265,7 @@ compileOsm = (bbox, osm, dem) ->
     buffer = turf.buffer(osmFeature[o.type + '/' + o.id], 0, 'meters')
     f = turf.intersect(bboxPoly, buffer.features[0])
     projectCoord(f.geometry.coordinates)
-    f.id = "#{o.type}/#{o.id}"
+    f.id = osmid(o)
     f.properties = {type: type}
     return f
 
@@ -270,7 +274,7 @@ compileOsm = (bbox, osm, dem) ->
     for m in relation.members
       id = "#{m.type}/#{m.ref}"
       if obj[id].type == 'way'
-        segments.push(m.ref)
+        segments.push(id)
 
     return {
       segments: segments

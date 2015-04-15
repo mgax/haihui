@@ -45,21 +45,25 @@ app.features = (options) ->
       .data(segmentLayer)
     .enter().append('path')
       .attr('class', 'segment')
+      .attr('id', (d) -> d.id)
 
   lakes.selectAll('.lake')
       .data(lakesLayer)
     .enter().append('path')
       .attr('class', 'lake')
+      .attr('id', (d) -> d.id)
 
   rivers.selectAll('.river')
       .data(riversLayer)
     .enter().append('path')
       .attr('class', 'river')
+      .attr('id', (d) -> d.id)
 
   highways.selectAll('.highway')
       .data(highwaysLayer)
     .enter().append('path')
       .attr('class', (d) -> "highway highway-#{d.properties.grade}")
+      .attr('id', (d) -> d.id)
 
   render = ->
     land.selectAll('.landPoly')
@@ -110,6 +114,7 @@ app.features = (options) ->
       if x > 0 and x < map.width and y > 0 and y < map.height
         if (symbolType = app.symbol[poi.properties.type])?
           symbol = {
+            id: poi.id
             properties: poi.properties
             x: x
             y: y
@@ -121,6 +126,7 @@ app.features = (options) ->
     symbols.selectAll('.symbol')
         .data(symbolList)
       .enter().append('g')
+        .attr('id', (d) -> d.id)
         .attr('class', 'symbol')
         .attr('transform', (d) -> "translate(#{d.x},#{d.y})")
         .each(app.symbol.render)
