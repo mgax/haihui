@@ -321,7 +321,7 @@ compileOsm = (bbox, osm, dem) ->
     poi.sort((a, b) -> a.properties.altitude - b.properties.altitude)
 
     layers = {
-      segments: turf.featurecollection(segment(id) for id in segmentIds.values())
+      segments: turf.featurecollection(segment(id) for id in segmentIds.values().sort())
       poi: turf.featurecollection(poi)
       highways: turf.featurecollection(highways)
       rivers: turf.featurecollection(rivers)
