@@ -160,6 +160,7 @@ data.build = (region) ->
   .then (db) ->
     ensureDir("build/#{region}")
     fs.writeFileSync("build/#{region}/data.json", JSON.stringify(db))
+    data.htmlRegion(region)
     console.log("done", region)
 
 
