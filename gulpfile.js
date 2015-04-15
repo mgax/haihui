@@ -40,7 +40,7 @@ regionList.forEach(function(region) {
 gulp.task('data', regionList.map(function(region) { return 'data-' + region }));
 gulp.task('data', function() {
   var done = Q.defer();
-  async.eachLimit(regionList, 3, function(region, cb) {
+  async.eachLimit(regionList, 1, function(region, cb) {
     data.build(region).done(function() { cb() });
   }, function(err) { if(err) done.reject(err); else done.resolve(); });
   return done.promise;
