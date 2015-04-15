@@ -82,10 +82,9 @@ app.location = (options) ->
   positionOk = (evt) ->
     coords = evt.coords
     return if coords.accuracy > ACCURACY_LIMIT
-    location = {
-      pos: [coords.longitude, coords.latitude]
-      accuracy: coords.accuracy
-    }
+    pos = [coords.longitude, coords.latitude]
+    return unless app.inside(map.wgsProjection(pos), map.db.bbox)
+    location = {pos: pos, accuracy: coords.accuracy}
 
     center = false
     if locationMode == LOCATION_WAIT
