@@ -112,11 +112,11 @@ app.canvas = (options) ->
 
     mapLayer.attr('style', style)
 
-    #if map.debug.coordinates
-    #  uiLayer.on 'mousemove', ->
-    #    console.log(proj.inverse(projection.invert([d3.event.x, d3.event.y])))
-    #else
-    #  uiLayer.on 'mousemove', ->
+    if map.debug.coordinates
+      mapLayer.on 'mousemove', ->
+        console.log(proj.inverse(projection.invert([d3.event.x, d3.event.y])))
+    else
+      mapLayer.on 'mousemove', ->
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])
