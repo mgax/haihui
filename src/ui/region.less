@@ -6,7 +6,7 @@ html, body {
     overflow: hidden;
 }
 
-svg {
+.mapLayer {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -17,6 +17,9 @@ svg {
     text {
         font-family: Helvetica, Arial, sans-serif;
         font-size: 12px;
+        cursor: default;
+        -webkit-user-select: none;
+                user-select: none;
     }
 
     text.halo {
@@ -128,9 +131,13 @@ svg {
 }
 
 .actionbar {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+
     .background {
         fill: #ccc;
-        opacity: .8;
+        fill-opacity: .8;
     }
 }
 
@@ -175,4 +182,10 @@ svg {
         fill: #23527c;
         text-decoration: underline;
     }
+}
+
+.symbolLabel text, .contour-label, {
+    cursor: default;
+    -webkit-user-select: none;
+            user-select: none;
 }

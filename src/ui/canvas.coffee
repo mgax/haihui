@@ -3,6 +3,8 @@ app.canvas = (options) ->
   bbox = map.db.bbox
   map.debug.coordinates = false
 
+  canvas = {}
+
   extent = {
     w: d3.max([-bbox[0], bbox[2]]) * 2
     h: d3.max([-bbox[1], bbox[3]]) * 2
@@ -45,24 +47,19 @@ app.canvas = (options) ->
       .projection(stream: (s) -> simplify.stream(clip.stream(projection.stream(s))))
 
   mapLayer = d3.select('body').append('svg').attr('class', 'mapLayer')
-  uiLayer = d3.select('body').append('svg')
-      .attr('class', 'uiLayer')
+  canvas.actionbar = d3.select('body').append('svg')
+      .attr('class', 'actionbar')
+      .attr('height', app.ACTIONBAR_HEIGHT)
 
   app.symbol.defs(mapLayer.append('defs'))
 
-  canvas = {}
   canvas.land = mapLayer.append('g')
   canvas.contours = mapLayer.append('g')
   canvas.features = mapLayer.append('g')
   canvas.symbols = mapLayer.append('g')
   canvas.locationg = mapLayer.append('g').attr('class', 'location')
 
-  uiLayer.append('rect')
-      .attr('class', 'zoomrect')
-      .call(zoom)
-
-  actionbar = canvas.actionbar = uiLayer.append('g')
-      .attr('class', 'actionbar')
+  d3.select('body').call(zoom)
 
   resize = ->
     if map.sc?
@@ -82,15 +79,8 @@ app.canvas = (options) ->
       tr = [0, 0]
       center = [0, 0]
 
-    uiLayer.select('.zoomrect')
-        .attr('width', map.width)
-        .attr('height', map.height)
-
     updateProjection(sc, tr)
     zoom.scaleExtent([minScale, 3])
-
-    actionbar.attr('transform', "translate(0, #{map.height - app.ACTIONBAR_HEIGHT})")
-    actionbar.select('.background').attr('width', map.width)
 
     map.centerAt(center, map.sc)
     resetMap()
@@ -122,11 +112,11 @@ app.canvas = (options) ->
 
     mapLayer.attr('style', style)
 
-    if map.debug.coordinates
-      uiLayer.on 'mousemove', ->
-        console.log(proj.inverse(projection.invert([d3.event.x, d3.event.y])))
-    else
-      uiLayer.on 'mousemove', ->
+    #if map.debug.coordinates
+    #  uiLayer.on 'mousemove', ->
+    #    console.log(proj.inverse(projection.invert([d3.event.x, d3.event.y])))
+    #else
+    #  uiLayer.on 'mousemove', ->
 
   map.centerAt = (pos, new_sc) ->
     updateProjection(new_sc, [0, 0])

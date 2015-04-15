@@ -16,7 +16,8 @@ initialize = (db) ->
 
   canvas.actionbar.append('rect')
       .attr('class', 'background')
-      .attr('height', app.ACTIONBAR_HEIGHT)
+      .attr('height', '100%')
+      .attr('width', '100%')
 
   actionbarRight = canvas.actionbar.append('g')
 
