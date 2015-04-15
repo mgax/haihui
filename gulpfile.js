@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     Q = require('q'),
     http = require('http'),
     express = require('express'),
+    async = require('async'),
     data = require('./src/data.coffee');
 
 
@@ -37,6 +38,13 @@ regionList.forEach(function(region) {
 
 
 gulp.task('data', regionList.map(function(region) { return 'data-' + region }));
+gulp.task('data', function() {
+  var done = Q.defer();
+  async.eachLimit(regionList, 3, function(region, cb) {
+    data.build(region).done(function() { cb() });
+  }, function(err) { if(err) done.reject(err); else done.resolve(); });
+  return done.promise;
+});
 
 
 gulp.task('html', function() {
