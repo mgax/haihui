@@ -108,6 +108,7 @@ albersProj = (param) ->
 
 landuseType = (o) ->
   switch o.tags.natural
+    when 'beach'        then return 'beach'
     when 'heath'        then return 'heath'
     when 'rock'         then return 'rock'
     when 'scrub'        then return 'scrub'
@@ -125,6 +126,10 @@ landuseType = (o) ->
     when 'orchard'      then return 'orchard'
     when 'quarry'       then return 'quarry'
     when 'residential'  then return 'residential'
+    when 'vineyard'     then return 'vineyard'
+
+  switch o.tags.leisure
+    when 'park'         then return 'park'
 
 
 query = (bbox) ->
@@ -143,6 +148,8 @@ query = (bbox) ->
     'relation["landuse"~""]'
     'way["natural"~""]'
     'relation["natural"~""]'
+    'way["leisure"="park"]'
+    'relation["leisure"="park"]'
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f}(#{overpassBbox});"
