@@ -45,7 +45,8 @@ app.canvas = (options) ->
       .projection(stream: (s) -> simplify.stream(clip.stream(projection.stream(s))))
 
   mapLayer = d3.select('body').append('svg').attr('class', 'mapLayer')
-  uiLayer = d3.select('body').append('svg').attr('class', 'uiLayer')
+  uiLayer = d3.select('body').append('svg')
+      .attr('class', 'uiLayer')
 
   app.symbol.defs(mapLayer.append('defs'))
 
@@ -144,7 +145,7 @@ app.canvas = (options) ->
     resetMap()
     map.dispatch.zoomend()
 
-  d3.select(window).on('resize', resize)
+  d3.select(window).on('resize.canvas', resize)
   map.dispatch.on('ready.canvas', resize)
 
   return canvas

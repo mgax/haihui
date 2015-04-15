@@ -18,13 +18,30 @@ initialize = (db) ->
       .attr('class', 'background')
       .attr('height', app.ACTIONBAR_HEIGHT)
 
-  scaleg = canvas.actionbar.append('g')
-      .attr('class', 'scale')
-      .attr('transform', "translate(10.5, 5.5)")
+  actionbarRight = canvas.actionbar.append('g')
 
-  locationbuttong = canvas.actionbar.append('g')
+  scaleg = actionbarRight.append('g')
+      .attr('class', 'scale')
+      .attr('transform', "translate(50.5, 5.5)")
+
+  locationbuttong = actionbarRight.append('g')
       .attr('class', 'locationbutton')
-      .attr('transform', "translate(200, #{app.ACTIONBAR_HEIGHT / 2})")
+      .attr('transform', "translate(10, #{app.ACTIONBAR_HEIGHT / 2})")
+
+  canvas.actionbar
+    .append('text')
+      .attr('class', 'logo')
+      .attr('transform', "translate(#{5},#{app.ACTIONBAR_HEIGHT / 2 + 8})")
+    .append('a')
+      .attr('xlink:href', '..')
+      .text('haihui')
+
+  placeActionbarRight = ->
+    width = parseInt(d3.select('body').style('width'))
+    actionbarRight.attr('transform', "translate(#{width - 220},0)")
+
+  placeActionbarRight()
+  d3.select(window).on('resize.placeActionbarRight', placeActionbarRight)
 
   app.location(
     map: map
