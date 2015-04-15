@@ -34,6 +34,9 @@ MAXBUFFER = 1024 * 1024 * 64  # 64MB
 SAVERAW = process.env.SAVERAW
 
 
+osmid = (o) -> "#{o.type}/#{o.id}"
+
+
 exec = (cmd, stdin='') ->
   done = Q.defer()
   console.log cmd
@@ -174,9 +177,9 @@ compileOsm = (bbox, osm, dem) ->
 
   point = (node) -> turf.point(projectNode(node))
 
-  linestring = (nodes) -> turf.linestring(projectNode(obj[n]) for n in nodes)
+  linestring = (nodes) -> turf.linestring(projectNode(obj["node/#{n}"]) for n in nodes)
 
-  polygon = (nodes) -> turf.polygon([projectNode(obj[n]) for n in nodes])
+  polygon = (nodes) -> turf.polygon([projectNode(obj["node/#{n}"]) for n in nodes])
 
   bboxPoly = turf.polygon([[
     [bbox[0], bbox[1]]
@@ -198,7 +201,7 @@ compileOsm = (bbox, osm, dem) ->
 
   segment = (id) ->
     f = linestring(obj[id].nodes)
-    f.id = id
+    f.id = id.split('/')[1]
     return f
 
   natural = (node) ->
@@ -215,7 +218,7 @@ compileOsm = (bbox, osm, dem) ->
       when 'node'
         f = point(o)
       when 'way'
-        f = turf.centroid(segment(o.id))
+        f = turf.centroid(segment(osmid(o)))
     f.id = o.id
     f.properties = {
       name: o.tags.name
@@ -265,7 +268,8 @@ compileOsm = (bbox, osm, dem) ->
   route = (relation) ->
     segments = []
     for m in relation.members
-      if obj[m.ref].type == 'way'
+      id = "#{m.type}/#{m.ref}"
+      if obj[id].type == 'way'
         segments.push(m.ref)
 
     return {
@@ -274,16 +278,16 @@ compileOsm = (bbox, osm, dem) ->
     }
 
   for o in osm.elements
-    obj[o.id] = o
+    obj[osmid(o)] = o
 
   for o in osm.elements
     continue unless o.tags?
 
     if o.type == 'relation' and o.tags.route == 'hiking'
-      routeIds.add(o.id)
+      routeIds.add(osmid(o))
       for m in o.members
         if m.type == 'way'
-          segmentIds.add(m.ref)
+          segmentIds.add("way/#{m.ref}")
 
     if o.type == 'node' and o.tags.natural?
       poi.push(natural(o))
