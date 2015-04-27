@@ -40,25 +40,25 @@
 
   <h2>Cum pot ajuta?</h2>
 
-  <p>În primul rând, folosește hărțile, și <a id="contact-link">dă-ne
-  feedback</a>! Spune-ne dacă aplicația funcționează cu probleme, sau dacă
+  <p>În primul rând folosește hărțile și <a id="contact-link">dă-ne
+  feedback</a>! Spune-ne dacă aplicația funcționează cu probleme sau dacă
   observi date greșite sau lipsă. Baza de date OpenStreetMap este <a
   href="http://wiki.openstreetmap.org/wiki/Beginners%27_Guide">construită de
-  voluntari</a>, și dacă ne trimiți date colectate prin GPS, putem îmbunătăți
+  voluntari</a> și dacă ne trimiți date colectate prin GPS putem îmbunătăți
   harta.</p>
 
   <h2>Detalii tehnice</h2>
 
-  <p>Pentru fiecare regiune, extragem datele din OpenStreetMap folosind
+  <p>Pentru fiecare regiune extragem datele din OpenStreetMap folosind
   serviciul <a href="http://overpass-api.de">Overpass</a>, le filtrăm și le
   convertim în format <a
   href="https://github.com/mbostock/topojson/wiki">TopoJSON</a>. Curbele de
   nivel provin din <a
   href="https://en.wikipedia.org/wiki/Shuttle_Radar_Topography_Mission">SRTM</a>.
-  Împachetăm toate datele pentru o regiune într-un fișier JSON, cu mărimea
-  între 150KB (Piatra Craiului) și 950KB (Făgăraș), redus la ~30% după
-  compresie gzip. În browser, salvăm datele în <a
-  href="https://en.wikipedia.org/wiki/Cache_manifest_in_HTML5">appcache</a>, și
+  Împachetăm toate datele pentru o regiune într-un fișier JSON cu mărimea
+  între 150KB (Piatra Craiului) și 950KB (Făgăraș) redus la ~30% după
+  compresie gzip. În browser salvăm datele în <a
+  href="https://en.wikipedia.org/wiki/Cache_manifest_in_HTML5">appcache</a> și
   desenăm harta ca <a
   href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a>
   folosind <a href="http://d3js.org">D3.js</a> și multă creativitate. :)</p>
