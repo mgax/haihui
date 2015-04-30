@@ -18,10 +18,14 @@ initialize = (db) ->
 
   scaleg = actionbarRight.append('g')
       .attr('class', 'scale')
-      .attr('transform', "translate(50.5, 5.5)")
+      .attr('transform', "translate(65.5, 5.5)")
 
   locationbuttong = actionbarRight.append('g')
       .attr('class', 'locationbutton')
+      .attr('transform', "translate(40, #{app.ACTIONBAR_HEIGHT / 2})")
+
+  noteG = actionbarRight.append('g')
+      .attr('class', 'note')
       .attr('transform', "translate(10, #{app.ACTIONBAR_HEIGHT / 2})")
 
   canvas.actionbar
@@ -34,7 +38,7 @@ initialize = (db) ->
 
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
-    actionbarRight.attr('transform', "translate(#{width - 220},0)")
+    actionbarRight.attr('transform', "translate(#{width - 230},0)")
 
   placeActionbarRight()
   d3.select(window).on('resize.placeActionbarRight', placeActionbarRight)
@@ -60,6 +64,11 @@ initialize = (db) ->
     featuresG: canvas.features
     landG: canvas.land
     symbols: canvas.symbols
+  )
+
+  app.note(
+    map: map
+    g: noteG
   )
 
   d3.select('.splash').remove()
