@@ -347,7 +347,7 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'node' and o.tags.natural?
       poi.push(natural(o))
 
-    if SLEEPING_PLACE[o.tags.tourism]
+    if o.tags.tourism?
       if o.type == 'node' or o.type == 'way'
         poi.push(tourism(o))
 

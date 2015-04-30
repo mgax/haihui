@@ -144,6 +144,22 @@ app.symbol.saddle = (selection) ->
 app.symbol.saddle.mask = {hw: 6, hh: 4}
 
 
+app.symbol.attraction = (selection) ->
+  d = "M-4,0 L4,0 M-2,-3.5 L2,3.5 M2,-3.5 L-2,3.5"
+
+  selection.append('path')
+      .attr('class', 'symbol-attraction-halo')
+      .attr('transform', 'translate(.5,.5)')
+      .attr('d', d)
+
+  selection.append('path')
+      .attr('class', 'symbol-attraction')
+      .attr('transform', 'translate(.5,.5)')
+      .attr('d', d)
+
+app.symbol.attraction.mask = {hw: 4, hh: 4}
+
+
 app.symbol.locationbutton = (selection) ->
   selection.append('path')
       .attr('class', 'arrow')
