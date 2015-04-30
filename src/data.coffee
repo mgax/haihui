@@ -22,6 +22,7 @@ data.REGION = {
   fagaras:    {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș"}
   iezer:      {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer"}
   macin:      {bbox: [28.13, 45.07, 28.42, 45.29], title: "Măcin"}
+  nerei:      {bbox: [21.70, 44.80, 22.00, 45.03], title: "Cheile Nerei"}
   parang:     {bbox: [23.43, 45.31, 23.82, 45.41], title: "Parâng"}
   piatramare: {bbox: [25.59, 45.48, 25.75, 45.60], title: "Piatra Mare"}
   retezat:    {bbox: [22.72, 45.29, 23.00, 45.42], title: "Retezat"}
@@ -400,6 +401,8 @@ compileOsm = (bbox, osm, dem) ->
 
 
 altitudeList = (coordinateList) ->
+  return Q([]) unless coordinateList.length
+
   input = coordinateList.map((p) -> "#{p[0]} #{p[1]}\n").join('')
 
   exec("gdallocationinfo -wgs84 -valonly data/srtm-1arcsec-ro.tiff", input)
