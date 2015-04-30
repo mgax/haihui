@@ -35,6 +35,7 @@ SLEEPING_PLACE = {
 
 MAXBUFFER = 1024 * 1024 * 64  # 64MB
 SAVERAW = process.env.SAVERAW
+RETRY = +(process.env.RETRY or 0)
 
 
 osmid = (o) -> "#{o.type}/#{o.id}"
@@ -65,7 +66,7 @@ httpGet = (url) ->
   deferred = Q.defer()
   request url, (err, res, body) ->
     if err?
-      deferred.fail(err)
+      deferred.reject(err)
     else
       deferred.resolve(body)
   return deferred.promise
@@ -73,6 +74,14 @@ httpGet = (url) ->
 
 ensureDir = (path) ->
   fs.mkdirSync(path) unless fs.existsSync(path)
+
+
+retry = (n, fn, args...) ->
+  fn(args...)
+  .catch (e) ->
+    if n > 0
+      console.log "call failed, trying #{n} more times"
+      retry(n-1, fn, args...)
 
 
 closeRings = (feature) ->
@@ -171,7 +180,7 @@ data.build = (region) ->
     q = query(bbox)
     url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
-    httpGet(url)
+    retry(RETRY, httpGet, url)
 
   .then (resp) ->
     if SAVERAW?
