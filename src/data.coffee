@@ -98,7 +98,7 @@ closeRings = (feature) ->
 
 
 buffer = (geometry) ->
-  JSON.parse(execSync('python src/buffer.py', JSON.stringify(geometry)))
+  JSON.parse(execSync("python #{__dirname}/buffer.py", JSON.stringify(geometry)))
 
 
 albers = (bbox) ->
