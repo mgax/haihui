@@ -169,7 +169,7 @@ query = (bbox) ->
 
 
 data.build = (region) ->
-  console.log("building", region)
+  console.log("=====    building '#{region}'    =====")
   bbox = data.REGION[region].bbox
   dem = null
 
