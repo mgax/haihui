@@ -165,7 +165,7 @@ query = (bbox) ->
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f}(#{overpassBbox});"
   items = (item(f) for f in filters).join('')
-  return "[out:json][timeout:25];(#{items});out body;>;out skel qt;"
+  return "[out:json][timeout:25];(#{items});out meta;>;out skel qt;"
 
 
 data.build = (region) ->
