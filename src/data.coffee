@@ -73,6 +73,13 @@ httpGet = (url) ->
   return deferred.promise
 
 
+overpass = (q) ->
+  url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
+  return httpGet(url)
+    .then (resp) ->
+      return JSON.parse(resp)
+
+
 ensureDir = (path) ->
   fs.mkdirSync(path) unless fs.existsSync(path)
 
@@ -179,22 +186,21 @@ data.build = (region) ->
   .then (rv) ->
     dem = rv
     q = query(bbox)
-    url = "http://overpass-api.de/api/interpreter?data=#{encodeURIComponent(q)}"
     console.log("overpass:", q)
-    retry(RETRY, httpGet, url)
+    retry(RETRY, overpass, q)
 
-  .then (resp) ->
+  .then (result) ->
     if SAVERAW?
-      return exec('python -m json.tool', resp).then (prettyResp) ->
-        fs.writeFileSync("#{SAVERAW}/#{region}.json", prettyResp)
-        return resp
+      return exec('python -m json.tool', JSON.stringify(result))
+        .then (prettyResp) ->
+          fs.writeFileSync("#{SAVERAW}/#{region}.json", prettyResp)
+          return result
 
     else
-      return resp
+      return result
 
-  .then (resp) ->
-    p = JSON.parse(resp)
-    compileOsm(bbox, p, dem)
+  .then (result) ->
+    compileOsm(bbox, result, dem)
 
   .then (db) ->
     ensureDir("build/#{region}")
