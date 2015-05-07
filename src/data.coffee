@@ -488,11 +488,17 @@ data.htmlGlobal = ->
   regions = Object.keys(data.REGION).sort()
   regionList = ({slug: r, title: data.REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
-  fs.writeFileSync("build/screenshot.jpg", fs.readFileSync("screenshot.jpg"))
+  fs.writeFileSync("build/screenshot.jpg",
+      fs.readFileSync("media/screenshot.jpg"))
+  fs.writeFileSync("build/apple-touch-icon.png",
+      fs.readFileSync("media/apple-touch-icon.png"))
+  fs.writeFileSync("build/favicon.ico",
+      fs.readFileSync("media/favicon.ico"))
   index_manifest = htmlManifest("build", [
     './'
     './screenshot.jpg'
     './bootstrap.min.css'
+    './favicon.ico'
   ])
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
@@ -512,6 +518,8 @@ data.htmlRegion = (region) ->
     '../topojson.min.js'
     '../proj4.js'
     '../ui.js'
+    '../favicon.ico'
+    '../apple-touch-icon.png'
     './data.json'
   ])
   fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
