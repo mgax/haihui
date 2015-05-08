@@ -169,6 +169,7 @@ app.features = (options) ->
           g = symbols.append('g')
               .attr('class', 'symbolLabel')
               .attr('transform', "translate(#{tx - thw},#{ty - thh - size.dy})")
+              .attr('for', symbol.id)
           app.symbol.textWithHalo(g, name)
           qt.add(x: tx, y: ty, hw: thw, hh: thh, labelFor: symbol)
 
