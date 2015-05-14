@@ -159,8 +159,6 @@ query = (bbox) ->
     'node["amenity"="shelter"]["shelter_type"="basic_hut"]'
     'way["highway"~""]'
     'way["waterway"~""]'
-    'way["water"="lake"]'
-    'way["water"="reservoir"]'
     'node["tourism"~""]'
     'way["tourism"~""]'
     'way["landuse"~""]'
@@ -367,7 +365,7 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'way' and o.tags.waterway?
       rivers.push(river(o))
 
-    if o.type == 'way' and (o.tags.water == 'lake' or o.tags.water == 'reservoir')
+    if o.type == 'way' and o.tags.natural == 'water'
       lakes.push(lake(o))
 
     if o.type == 'way' or o.type == 'relation'
