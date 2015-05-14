@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <title>Hărți haihui &mdash; {{ title }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="../region.css">
+<link rel="stylesheet" href="../region.css?h={{checksums.region_css}}">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
 <body>
@@ -23,8 +23,8 @@
 <script src="../topojson.min.js"></script>
 <script src="../proj4.js"></script>
 <script>window.app = {};</script>
-<script src="../ui.js"></script>
-<script>setTimeout(function() { app.load('data.json') }, 0);</script>
+<script src="../ui.js?h={{checksums.ui_js}}"></script>
+<script>setTimeout(function() { app.load('data.json?h={{checksums.data_json}}') }, 0);</script>
 
 <!-- Piwik -->
 <script type="text/javascript">

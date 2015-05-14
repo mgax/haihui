@@ -465,19 +465,20 @@ data.dem = (region) ->
   return buildDem()
 
 
+checksum = (filePath) ->
+  hash = crypto.createHash('sha1')
+  if /\/$/.test(filePath)
+    filePath += 'index.html'
+  hash.update(fs.readFileSync(filePath))
+  return hash.digest('hex')
+
+
 htmlManifest = (directory, fileNameList) ->
   manifest_appcache = template('manifest.appcache')
 
-  checksum = (filePath) ->
-    hash = crypto.createHash('sha1')
-    if /\/$/.test(filePath)
-      filePath += 'index.html'
-    hash.update(fs.readFileSync(filePath))
-    return hash.digest('hex')
-
   fileList = fileNameList.map (name) -> {
     name: name
-    checksum: checksum("#{directory}/#{name}")
+    checksum: checksum("#{directory}/#{name}") unless name.match(/\?h=/)
   }
   return manifest_appcache(fileList: fileList)
 
@@ -504,23 +505,28 @@ data.htmlGlobal = ->
 
 
 data.htmlRegion = (region) ->
+  checksums = {
+    region_css: checksum("build/region.css")
+    ui_js: checksum("build/ui.js")
+    data_json: checksum("build/#{region}/data.json")
+  }
   region_html = template('region.html')
 
   ensureDir("build/#{region}")
   fs.writeFileSync(
     "build/#{region}/index.html",
-    region_html(title: data.REGION[region].title)
+    region_html(title: data.REGION[region].title, checksums: checksums)
   )
   region_manifest = htmlManifest("build/#{region}", [
-    './'
-    '../region.css'
-    '../d3.min.js'
-    '../topojson.min.js'
-    '../proj4.js'
-    '../ui.js'
-    '../favicon.ico'
-    '../apple-touch-icon.png'
-    './data.json'
+    "./"
+    "../region.css?h=#{checksums['region_css']}"
+    "../d3.min.js"
+    "../topojson.min.js"
+    "../proj4.js"
+    "../ui.js?h=#{checksums['ui_js']}"
+    "../favicon.ico"
+    "../apple-touch-icon.png"
+    "./data.json?h=#{checksums['data_json']}"
   ])
   fs.writeFileSync("build/#{region}/manifest.appcache", region_manifest)
 
