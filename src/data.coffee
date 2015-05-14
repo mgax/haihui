@@ -153,20 +153,20 @@ landuseType = (o) ->
 
 query = (bbox) ->
   filters = [
-    'relation["route"="hiking"]'
-    'node["natural"="saddle"]'
-    'node["natural"="peak"]'
-    'node["amenity"="shelter"]["shelter_type"="basic_hut"]'
-    'way["highway"~""]'
-    'way["waterway"~""]'
-    'node["tourism"~""]'
-    'way["tourism"~""]'
-    'way["landuse"~""]'
-    'relation["landuse"~""]'
-    'way["natural"~""]'
-    'relation["natural"~""]'
-    'way["leisure"="park"]'
-    'relation["leisure"="park"]'
+    'relation[route=hiking]'
+    'node[natural=saddle]'
+    'node[natural=peak]'
+    'node[amenity=shelter][shelter_type=basic_hut]'
+    'way[highway]'
+    'way[waterway]'
+    'node[tourism]'
+    'way[tourism]'
+    'way[landuse]'
+    'relation[landuse]'
+    'way[natural]'
+    'relation[natural]'
+    'way[leisure=park]'
+    'relation[leisure=park]'
   ]
   overpassBbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
   item = (f) -> "#{f}(#{overpassBbox});"
