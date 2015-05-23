@@ -12,6 +12,26 @@ gulp
 gulp devel
 ```
 
+#Ubuntu tips
+
+```shell
+sudo apt-get install python-gdal gdal-bin
+# under project's home location
+npm install -g topojson
+```
+Download file
+
+[GEO Archive](https://grep.ro/quickpub/srtm/srtm-1arcsec-ro.tiff.bz2)
+
+extract and copy to ''data/'' folder from project's home location
+
+create a folder named ''contours/'' under ''data/''
+
+#To create map for specific region
+
+```shell
+gulp data-crai
+```
 
 ## How it works
 
