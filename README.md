@@ -27,11 +27,12 @@ extract and copy to ''data/'' folder from project's home location
 
 create a folder named ''contours/'' under ''data/''
 
-#To create map for specific region
+Create map for specific region, eg. for Piatra Craiului (crai)
 
 ```shell
-gulp data-crai
+gulp data-crai # crai --> is the region name
 ```
+
 
 ## How it works
 
