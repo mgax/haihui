@@ -483,19 +483,25 @@ htmlManifest = (directory, fileNameList) ->
 
 data.htmlGlobal = ->
   index_html = template('index.html')
+  data_html = template('data.html')
 
   regions = Object.keys(data.REGION).sort()
   regionList = ({slug: r, title: data.REGION[r].title} for r in regions)
   fs.writeFileSync("build/index.html", index_html(regionList: regionList))
+  fs.writeFileSync("build/data.html", data_html(regionList: regionList))
   fs.writeFileSync("build/screenshot.jpg",
       fs.readFileSync("media/screenshot.jpg"))
+  fs.writeFileSync("build/dataimg.jpg",
+      fs.readFileSync("media/dataimg.jpg"))
   fs.writeFileSync("build/apple-touch-icon.png",
       fs.readFileSync("media/apple-touch-icon.png"))
   fs.writeFileSync("build/favicon.ico",
       fs.readFileSync("media/favicon.ico"))
   index_manifest = htmlManifest("build", [
     './'
+    './data.html'
     './screenshot.jpg'
+    './dataimg.jpg'
     './bootstrap.min.css'
     './favicon.ico'
   ])

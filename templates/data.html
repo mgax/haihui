@@ -1,0 +1,62 @@
+<!doctype html>
+<html manifest="./manifest.appcache">
+<meta charset="utf-8">
+<title>Date &mdash; Hărți haihui</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="bootstrap.min.css">
+<style>
+.dataimg { margin: 30px 0; overflow: hidden; }
+.dataimg-image { position: relative; left: 50%; margin-left: -480px; height: 150px; width: 960px; background: url(dataimg.jpg) no-repeat; background-size: 960px 150px; }
+</style>
+
+<body>
+
+<div class="container">
+  <h1>haihui &mdash; date</h1>
+
+  <p><a href="/">Harta haihui</a> este construită pe baza datelor din <a
+  href="http://www.openstreetmap.org/about">OpenStreetMap</a> care sunt
+  disponibile pentru utilizare în orice aplicație. Calitatea datelor montane,
+  pentru România, variază de la zonă la zonă, în funcție de interesul
+  contributorilor voluntari la OpenStreetMap.</p>
+
+  <div class="dataimg"><div class="dataimg-image"></div></div>
+
+  <h2>Cum pot ajuta?</h2>
+
+  <p>Poți colecta date GPS (de exemplu trasee sau puncte de interes) și le poți
+  <a href="http://wiki.openstreetmap.org/wiki/Beginners%27_guide">adăuga</a> la
+  OpenStreetMap. Dacă nu vrei să editezi direct harta, <a
+  id="contact-link">trimite-mi datele mie</a>, și le încarc eu.</p>
+</div>
+
+<script>
+(function() {
+  var c = 'rep.ro', b = 'haihui@g', a = 'mailto:';
+  document.getElementById('contact-link').setAttribute('href', a+b+c);
+
+  if(window.applicationCache) {
+    applicationCache.addEventListener('updateready', function() {
+      window.applicationCache.swapCache();
+      window.location.reload();
+    });
+  }
+})();
+</script>
+
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    if(location.href.indexOf('haihui.grep.ro') == -1) return;
+    var u="//apti.ro/trafic/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//apti.ro/trafic/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
