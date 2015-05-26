@@ -15,7 +15,7 @@ app.location = (options) ->
 
   locationg.append('circle')
       .attr('class', 'midpoint')
-      .attr('r', 2)
+      .attr('r', 6)
 
   locationg.append('circle')
       .attr('class', 'accuracy')
@@ -68,7 +68,7 @@ app.location = (options) ->
         .attr('transform', "translate(#{xy})")
 
     locationg.select('.accuracy')
-        .attr('r', location.accuracy * map.sc)
+        .attr('r', d3.max([location.accuracy * map.sc, 8]))
 
   map.dispatch.on 'zoom.location', ->
     positionDisableTracking()
