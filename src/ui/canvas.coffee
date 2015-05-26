@@ -127,11 +127,13 @@ app.canvas = (options) ->
     map.dispatch.redraw()
 
   zoom.on 'zoom', ->
+    map.zooming = true
     updateProjection(d3.event.scale, d3.event.translate)
     transformMap(d3.event.scale, d3.event.translate)
     map.dispatch.zoom()
 
   zoom.on 'zoomend', ->
+    map.zooming = false
     resetMap()
     map.dispatch.zoomend()
 

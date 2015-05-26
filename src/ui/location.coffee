@@ -59,6 +59,9 @@ app.location = (options) ->
   app.symbol.locationbutton(button)
 
   showLocation = () ->
+    if map.zooming
+      return
+
     unless location?
       locationg.style('display', 'none')
       return
