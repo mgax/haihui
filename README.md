@@ -2,7 +2,7 @@
 
 Collection of hiking maps, optimized for mobile use, based on OSM data.
 
-![screenshot](https://raw.githubusercontent.com/mgax/haihui/master/screenshot.jpg)
+![screenshot](https://raw.githubusercontent.com/mgax/haihui/master/media/screenshot.jpg)
 
 ## Setup
 
