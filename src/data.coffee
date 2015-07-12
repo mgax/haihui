@@ -14,7 +14,7 @@ data = module.exports = {}
 
 
 data.REGION = {
-  bucegi:     {bbox: [25.39, 45.34, 25.54, 45.49], title: "Bucegi"}
+  bucegi:     {bbox: [25.36, 45.33, 25.58, 45.52], title: "Bucegi"}
   capatanii:  {bbox: [24.00, 45.17, 24.19, 45.34], title: "Căpățânii"}
   ceahlau:    {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău"}
   ciucas:     {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș"}
