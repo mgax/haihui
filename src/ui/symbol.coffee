@@ -118,6 +118,7 @@ app.symbol.alpine_hut.mask = {hw: 7, hh: 5}
 
 app.symbol.chalet = app.symbol.alpine_hut
 app.symbol.hotel = app.symbol.alpine_hut
+app.symbol.guest_house = app.symbol.alpine_hut
 
 
 app.symbol.basic_hut = (selection) ->
