@@ -1,2 +1,5 @@
 /build
 /node_modules
+.idea
+data/srtm-1arcsec-ro.tiff
+data/contours
