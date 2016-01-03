@@ -1,4 +1,3 @@
 /build
 /node_modules
-data/srtm-1arcsec-ro.tiff
-data/contours
+/data
