@@ -36,6 +36,12 @@ initialize = (db) ->
       .attr('xlink:href', '..')
       .text('haihui')
 
+  weatherG = actionbarRight.append('g')
+    .attr('transform', 'translate(-30, 0)')
+
+  weatherButton = weatherG.append('a')
+    .text("WEATHER")
+
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
     actionbarRight.attr('transform', "translate(#{width - 230},0)")
@@ -69,6 +75,11 @@ initialize = (db) ->
   app.note(
     map: map
     g: noteG
+  )
+
+  app.weather(
+    map: map
+    button: weatherButton
   )
 
   d3.select('.splash').remove()
