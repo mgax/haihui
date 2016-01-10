@@ -164,16 +164,16 @@ app.symbol.attraction.mask = {hw: 4, hh: 4}
 app.symbol.locationbutton = (selection) ->
   selection.append('path')
       .attr('class', 'arrow')
-      .attr('d', "M6,-6 L0,6 L0,0 L-6,0 L6,-6")
+      .attr('d', "M17,-17 L0,17 L0,0 L-17,0 L17,-17")
 
   selection.append('circle')
       .attr('class', 'track')
-      .attr('r', 10)
+      .attr('r', 17)
 
   selection.selectAll('.dot')
-      .data([-6, 0, 6])
+      .data([-10, 0, 10])
     .enter().append('circle')
       .attr('class', 'dot')
-      .attr('r', 2)
+      .attr('r', 3)
       .attr('cx', (d) -> d)
-      .attr('cy', 4)
+      .attr('cy', 6)
