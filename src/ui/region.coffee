@@ -1,4 +1,4 @@
-app.ACTIONBAR_HEIGHT = 50
+app.ACTIONBAR_HEIGHT = 30
 
 
 initialize = (db) ->
@@ -18,21 +18,15 @@ initialize = (db) ->
 
   scaleg = actionbarRight.append('g')
       .attr('class', 'scale')
-      .attr('transform', "translate(82, 15)")
+      .attr('transform', "translate(65.5, 5.5)")
 
-  locationbuttong = actionbarRight
-    .append('g')
-      .attr('transform', 'scale(2.6)')
-    .append('g')
+  locationbuttong = actionbarRight.append('g')
       .attr('class', 'locationbutton')
-      .attr('transform', "translate(18, #{app.ACTIONBAR_HEIGHT / 2 / 2.6})")
+      .attr('transform', "translate(40, #{app.ACTIONBAR_HEIGHT / 2})")
 
-  noteG = actionbarRight
-    .append('g')
-      .attr('transform', 'scale(1.7)')
-    .append('g')
+  noteG = actionbarRight.append('g')
       .attr('class', 'note')
-      .attr('transform', "translate(0, #{app.ACTIONBAR_HEIGHT / 2 / 1.7})")
+      .attr('transform', "translate(10, #{app.ACTIONBAR_HEIGHT / 2})")
 
   canvas.actionbar
     .append('text')
@@ -44,7 +38,7 @@ initialize = (db) ->
 
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
-    actionbarRight.attr('transform', "translate(#{width - 250},0)")
+    actionbarRight.attr('transform', "translate(#{width - 230},0)")
 
   placeActionbarRight()
   d3.select(window).on('resize.placeActionbarRight', placeActionbarRight)
