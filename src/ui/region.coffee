@@ -37,10 +37,15 @@ initialize = (db) ->
       .text('haihui')
 
   weatherG = actionbarRight.append('g')
-    .attr('transform', 'translate(-30, 0)')
+      .attr('class', "weather")
+      .attr('transform', "translate(-40,0)")
 
-  weatherButton = weatherG.append('a')
-    .text("WEATHER")
+  # TODO: remove the <g transform="scale"> after the UI resize gets accepted
+  weatherG = weatherG.append('g')
+    .attr('transform', 'scale(0.6)')
+
+  weatherButton = weatherG.append('a').attr('target',"_blank")
+
 
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
