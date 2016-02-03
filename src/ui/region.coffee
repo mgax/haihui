@@ -36,6 +36,17 @@ initialize = (db) ->
       .attr('xlink:href', '..')
       .text('haihui')
 
+  weatherG = actionbarRight.append('g')
+      .attr('class', "weather")
+      .attr('transform', "translate(-40,0)")
+
+  # TODO: remove the <g transform="scale"> after the UI resize gets accepted
+  weatherG = weatherG.append('g')
+    .attr('transform', 'scale(0.6)')
+
+  weatherButton = weatherG.append('a').attr('target',"_blank")
+
+
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
     actionbarRight.attr('transform', "translate(#{width - 250},0)")
@@ -69,6 +80,11 @@ initialize = (db) ->
   app.note(
     map: map
     g: noteG
+  )
+
+  app.weather(
+    map: map
+    button: weatherButton
   )
 
   d3.select('.splash').remove()
