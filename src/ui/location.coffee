@@ -32,10 +32,10 @@ app.location = (options) ->
 
   button.append('rect')
       .attr('class', 'buttonmask')
-      .attr('x', -15)
-      .attr('y', -15)
-      .attr('width', 30)
-      .attr('height', 30)
+      .attr('x', -25)
+      .attr('y', -25)
+      .attr('width', 50)
+      .attr('height', 50)
 
   button.on 'click', ->
       switch locationMode

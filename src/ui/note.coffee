@@ -5,7 +5,7 @@ app.note = (options) ->
       .attr('xlink:href', '#')
 
   btn.append('circle')
-      .attr('r', 10)
+      .attr('r', 17)
 
   btn.append('text')
       .attr('transform', "translate(-3,5)")
