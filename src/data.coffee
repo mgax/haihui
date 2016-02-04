@@ -202,7 +202,9 @@ data.build = (region) ->
 
   .then (db) ->
     ensureDir("build/#{region}")
+    ensureDir("cordova/www/#{region}")
     fs.writeFileSync("build/#{region}/data.json", JSON.stringify(db))
+    fs.writeFileSync("cordova/www/#{region}/data.json", JSON.stringify(db))
     data.htmlRegion(region)
     console.log("done", region)
 
@@ -517,8 +519,13 @@ data.htmlRegion = (region) ->
   region_html = template('region.html')
 
   ensureDir("build/#{region}")
+  ensureDir("cordova/www/#{region}")
   fs.writeFileSync(
     "build/#{region}/index.html",
+    region_html(title: data.REGION[region].title, checksums: checksums)
+  )
+  fs.writeFileSync(
+    "cordova/www/#{region}/index.html",
     region_html(title: data.REGION[region].title, checksums: checksums)
   )
   region_manifest = htmlManifest("build/#{region}", [

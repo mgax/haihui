@@ -11,7 +11,12 @@ npm install
 gulp
 gulp devel
 ```
-
+## Cordova build for Android (optional)
+```shell
+cd cordova
+cordova platform add android
+cordova run
+```
 
 ## How it works
 

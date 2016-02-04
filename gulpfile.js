@@ -59,12 +59,16 @@ gulp.task('libs', function() {
   var cdnjs = 'http://cdnjs.cloudflare.com/ajax/libs/';
   request(cdnjs + 'd3/3.5.3/d3.min.js', function(err, res, body) {
     fs.writeFileSync('build/d3.min.js', body);
+    fs.writeFileSync('cordova/www/d3.min.js', body);
     request(cdnjs + 'topojson/1.6.9/topojson.min.js', function(err, res, body) {
       fs.writeFileSync('build/topojson.min.js', body);
+      fs.writeFileSync('cordova/www/topojson.min.js', body);
       request(cdnjs + 'twitter-bootstrap/3.3.2/css/bootstrap.min.css', function(err, res, body) {
         fs.writeFileSync('build/bootstrap.min.css', body);
+        fs.writeFileSync('cordova/www/bootstrap.min.css', body);
         request(cdnjs + 'proj4js/2.3.3/proj4.js', function(err, res, body) {
           fs.writeFileSync('build/proj4.js', body);
+          fs.writeFileSync('cordova/www/proj4.js', body);
           done.resolve();
         });
       });
@@ -80,7 +84,8 @@ gulp.task('js', function() {
     .pipe(coffee())
     .pipe(concat('ui.js'))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./build'));
+    .pipe(gulp.dest('./build'))
+    .pipe(gulp.dest('./cordova/www'));
 });
 
 
@@ -88,6 +93,7 @@ gulp.task('css', function() {
   return gulp.src('src/ui/region.less')
     .pipe(less())
     .pipe(gulp.dest('./build'))
+    .pipe(gulp.dest('./cordova/www'));
 });
 
 
@@ -104,4 +110,4 @@ gulp.task('auto', function() {
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui', 'libs']);
+gulp.task('default', ['ui','libs','data']);
