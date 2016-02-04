@@ -1,3 +1,10 @@
 /build
 /node_modules
 /data
+cordova/*/
+!cordova/config.xml
+!cordova/www
+cordova/www/*
+!cordova/www/index.html
+
+
