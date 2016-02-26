@@ -36,6 +36,10 @@ initialize = (db) ->
       .attr('xlink:href', '..')
       .text('haihui')
 
+  actionbarRight.append('a')
+      .attr('xlink:href', db.meteoLink)
+      .text('meteo')
+
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))
     actionbarRight.attr('transform', "translate(#{width - 250},0)")
