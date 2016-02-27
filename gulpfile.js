@@ -109,4 +109,4 @@ gulp.task('auto', function() {
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui', 'libs', 'media']);
+gulp.task('default', ['data', 'ui', 'libs']);
