@@ -8,7 +8,13 @@ CACHE:
 {{/fileList}}
 
 NETWORK:
+*
 ../ui.js.map
 ../region.css.map
+*cdn.leafletjs.com*
+http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css
+http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js
+*tile.openstreetmap.org/*
+*api.tiles.mapbox.com*
 http://apti.ro/trafic/piwik.js
 http://apti.ro/trafic/piwik.php
