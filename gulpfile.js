@@ -52,7 +52,9 @@ gulp.task('html', function() {
 });
 
 
-gulp.task('libs', function() {
+gulp.task('assets', function() {
+  gulp.src('media/**/*').pipe(gulp.dest('./build'));
+
   var done = Q.defer();
   var request = require('request');
   var fs = require('fs');
@@ -90,23 +92,16 @@ gulp.task('css', function() {
     .pipe(gulp.dest('./build'))
 });
 
-gulp.task('media', function() {
-  return gulp.src('media/**/*').pipe(gulp.dest('./build'));
-});
-
-
-gulp.task('ui', ['js', 'css', 'media'], function() {
+gulp.task('ui', ['js', 'css'], function() {
   gulp.start('html');
 });
-
 
 gulp.task('auto', function() {
   gulp.start('ui');
   gulp.watch('src/ui/**/*', ['ui']);
   gulp.watch('templates/**/*', ['ui']);
-  gulp.watch('media/**/*', ['media']);
 });
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui', 'libs']);
+gulp.task('default', ['data', 'ui', 'assets']);
