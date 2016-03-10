@@ -28,6 +28,20 @@ initialize = (db) ->
       .attr('class', 'note')
       .attr('transform', "translate(0, #{app.ACTIONBAR_HEIGHT / 2})")
 
+
+  meteoG = actionbarRight.append('g')
+    .attr('transform', "translate(-75, 3)")
+    .attr('class', "meteobutton")
+
+  meteoG.append('a')
+      .attr('xlink:href', db.meteoLink)
+      .attr('target', "_blank")
+    .append('image')
+      .attr('xlink:href', '../meteoblue-logo.png')
+      .attr('height', app.ACTIONBAR_HEIGHT - 6)
+      .attr('width', app.ACTIONBAR_HEIGHT - 6)
+
+
   canvas.actionbar
     .append('text')
       .attr('class', 'logo')
@@ -35,6 +49,9 @@ initialize = (db) ->
     .append('a')
       .attr('xlink:href', '..')
       .text('haihui')
+
+
+
 
   placeActionbarRight = ->
     width = parseInt(d3.select('body').style('width'))

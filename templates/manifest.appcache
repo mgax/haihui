@@ -10,5 +10,6 @@ CACHE:
 NETWORK:
 ../ui.js.map
 ../region.css.map
+../meteoblue-logo.png
 http://apti.ro/trafic/piwik.js
 http://apti.ro/trafic/piwik.php

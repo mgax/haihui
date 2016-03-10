@@ -18,7 +18,7 @@ gulp.task('serve', function() {
   var app = express().use('/', express.static(__dirname + '/build'));
   http.createServer(app).listen(port, host, function() {
     console.log('devel server listening on ' + host + ':' + port);
-  })
+  });
 
   return Q.defer().promise;
 });
@@ -52,7 +52,9 @@ gulp.task('html', function() {
 });
 
 
-gulp.task('libs', function() {
+gulp.task('assets', function() {
+  gulp.src('media/**/*').pipe(gulp.dest('./build'));
+
   var done = Q.defer();
   var request = require('request');
   var fs = require('fs');
@@ -90,11 +92,9 @@ gulp.task('css', function() {
     .pipe(gulp.dest('./build'))
 });
 
-
 gulp.task('ui', ['js', 'css'], function() {
   gulp.start('html');
 });
-
 
 gulp.task('auto', function() {
   gulp.start('ui');
@@ -104,4 +104,4 @@ gulp.task('auto', function() {
 
 
 gulp.task('devel', ['auto', 'serve']);
-gulp.task('default', ['data', 'ui', 'libs']);
+gulp.task('default', ['data', 'ui', 'assets']);

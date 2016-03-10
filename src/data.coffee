@@ -14,18 +14,18 @@ data = module.exports = {}
 
 
 data.REGION = {
-  bucegi:     {bbox: [25.36, 45.33, 25.58, 45.52], title: "Bucegi"}
-  capatanii:  {bbox: [24.00, 45.17, 24.19, 45.34], title: "Căpățânii"}
-  ceahlau:    {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău"}
-  ciucas:     {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș"}
-  crai:       {bbox: [25.15, 45.49, 25.30, 45.58], title: "Piatra Craiului"}
-  fagaras:    {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș"}
-  iezer:      {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer"}
-  macin:      {bbox: [28.13, 45.07, 28.42, 45.29], title: "Măcin"}
-  nerei:      {bbox: [21.70, 44.80, 22.00, 45.03], title: "Cheile Nerei"}
-  parang:     {bbox: [23.43, 45.31, 23.82, 45.41], title: "Parâng"}
-  piatramare: {bbox: [25.59, 45.48, 25.75, 45.60], title: "Piatra Mare"}
-  retezat:    {bbox: [22.72, 45.29, 23.00, 45.42], title: "Retezat"}
+  bucegi:     {bbox: [25.36, 45.33, 25.58, 45.52], title: "Bucegi", meteoLink: "mun%C5%A3ii-bucegi_romania_683598"}
+  capatanii:  {bbox: [24.00, 45.17, 24.19, 45.34], title: "Căpățânii", meteoLink: "mun%C5%A3ii-c%C4%83p%C4%83%C5%A3%C3%A2nii_romania_682818"}
+  ceahlau:    {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău", meteoLink: "masivul-ceahl%C4%83u_romania_682481 "}
+  ciucas:     {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș", meteoLink: "ciucas_romania_7874266"}
+  crai:       {bbox: [25.15, 45.49, 25.30, 45.58], title: "Piatra Craiului", meteoLink: "piatra-craiului_romania_670901"}
+  fagaras:    {bbox: [24.30, 45.47, 24.89, 45.73], title: "Făgăraș", meteoLink: "mun%C5%A3ii-f%C4%83g%C4%83ra%C5%9F_romania_678498"}
+  iezer:      {bbox: [24.85, 45.38, 25.10, 45.55], title: "Iezer", meteoLink: "mun%C5%A3ii-iezer_romania_675717"}
+  macin:      {bbox: [28.13, 45.07, 28.42, 45.29], title: "Măcin", meteoLink: "muntii-macin_romania_7289808"}
+  nerei:      {bbox: [21.70, 44.80, 22.00, 45.03], title: "Cheile Nerei", meteoLink: "44.946N21.863E"}
+  parang:     {bbox: [23.43, 45.31, 23.82, 45.41], title: "Parâng", meteoLink: "mun%C5%A3ii-par%C3%A2ng_romania_671333"}
+  piatramare: {bbox: [25.59, 45.48, 25.75, 45.60], title: "Piatra Mare", meteoLink: "piatra-mare_romania_7874272"}
+  retezat:    {bbox: [22.72, 45.29, 23.00, 45.42], title: "Retezat", meteoLink: "mun%C5%A3ii-retezatului_romania_668938"}
 }
 
 SLEEPING_PLACE = {
@@ -38,6 +38,7 @@ MAXBUFFER = 1024 * 1024 * 64  # 64MB
 SAVERAW = process.env.SAVERAW
 RETRY = +(process.env.RETRY or 0)
 
+METEOBLUE_LINK_ROOT = "https://www.meteoblue.com/en/weather/forecast/week/"
 
 osmid = (o) -> "#{o.type}/#{o.id}"
 
@@ -199,6 +200,10 @@ data.build = (region) ->
 
   .then (result) ->
     compileOsm(bbox, result, dem)
+
+  .then (result) ->
+    result.meteoLink = METEOBLUE_LINK_ROOT + data.REGION[region].meteoLink
+    return result
 
   .then (db) ->
     ensureDir("build/#{region}")
