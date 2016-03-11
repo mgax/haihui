@@ -86,13 +86,6 @@
 (function() {
   var c = 'rep.ro', b = 'haihui@g', a = 'mailto:';
   document.getElementById('contact-link').setAttribute('href', a+b+c);
-
-  if(window.applicationCache) {
-    applicationCache.addEventListener('updateready', function() {
-      window.applicationCache.swapCache();
-      window.location.reload();
-    });
-  }
 })();
 </script>
 
