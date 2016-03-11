@@ -507,6 +507,8 @@ data.htmlGlobal = ->
   ])
   fs.writeFileSync("build/manifest.appcache", index_manifest)
 
+  fs.writeFileSync("build/region-header.json", JSON.stringify(data.REGION))
+
 
 data.htmlRegion = (region) ->
   checksums = {
