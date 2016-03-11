@@ -97,43 +97,8 @@
 </script>
 
 <script>
-//  var map;
-//  var ajaxRequest;
-//  var plotlist;
-//  var plotlayers=[];
-//
-//  function initmap() {
-//     set up the map
-//    map = new L.Map('map');
-//
-//     create the tile layer with correct attribution
-//    var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-//    var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-//    var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib});
-
-//     start the map in South-East England
-//    map.setView(new L.LatLng(51.3, 0.7),9);
-//    map.addLayer(osm);
-//  }
-
-//  initmap();
-
-
-</script>
-
-<script>
-
-  MB_ACCESS = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
-  MB_ATTR = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-  MB_URL = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + MB_ACCESS;
-  OSM_URL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  OSM_ATTRIB = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
   CDB_URL = "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png";
   CDB_ATTR = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
-
 
   var map = L.map('map').setView([51.505, -0.09], 13);
 
