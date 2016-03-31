@@ -105,9 +105,10 @@
   map.fitBounds(bounds);
   map.setZoom(6);
 
-  d3.json("region-header.json", function(err, db) {
+  d3.json("region-boxes.json", function(err, db) {
     if(err) {
       console.error(err);
+      return;
     }
 
     for (var i in db) {

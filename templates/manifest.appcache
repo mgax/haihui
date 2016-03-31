@@ -8,4 +8,7 @@ CACHE:
 {{/fileList}}
 
 NETWORK:
-*
+../ui.js.map
+../region.css.map
+http://apti.ro/trafic/piwik.js
+http://apti.ro/trafic/piwik.php
