@@ -1,10 +1,15 @@
 <!doctype html>
-<html manifest="./manifest.appcache">
+<html>
 <meta charset="utf-8">
 <title>Hărți haihui</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script src="d3.min.js"></script>
+
 <style>
+  .map { min-height: 250px; overflow: hidden }
 .screenshot { margin: 30px 0; overflow: hidden; }
 .screenshot-image { position: relative; left: 50%; margin-left: -480px; height: 150px; width: 960px; background: url(screenshot.jpg) no-repeat; background-size: 960px 150px; }
 </style>
@@ -32,11 +37,19 @@
 
   <h2>Regiuni</h2>
 
-  <ul>
-  {{#regionList}}
-    <li><a href="{{slug}}/">{{title}}</a></li>
-  {{/regionList}}
-  </ul>
+  <div class="row">
+    <div class="col-sm-4">
+      <ul>
+        {{#regionList}}
+        <li><a href="{{slug}}/">{{title}}</a></li>
+        {{/regionList}}
+      </ul>
+    </div>
+    <div id="map" class="col-sm-8 map"></div>
+  </div>
+
+
+
 
   <h2>Cum pot ajuta?</h2>
 
@@ -73,14 +86,48 @@
 (function() {
   var c = 'rep.ro', b = 'haihui@g', a = 'mailto:';
   document.getElementById('contact-link').setAttribute('href', a+b+c);
-
-  if(window.applicationCache) {
-    applicationCache.addEventListener('updateready', function() {
-      window.applicationCache.swapCache();
-      window.location.reload();
-    });
-  }
 })();
+</script>
+
+<script>
+  CDB_URL = "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png";
+  CDB_ATTR = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
+
+  var map = L.map('map').setView([51.505, -0.09], 13);
+
+  L.tileLayer(CDB_URL, {attribution: CDB_ATTR, id: 'mapbox.streets'}).addTo(map);
+
+  var bounds = new L.LatLngBounds([
+    [43.373, 19.501],
+    [48.364, 30.663]
+  ]);
+
+  map.fitBounds(bounds);
+  map.setZoom(6);
+
+  d3.json("region-boxes.json", function(err, db) {
+    if(err) {
+      console.error(err);
+      return;
+    }
+
+    for (var i in db) {
+      if(!db.hasOwnProperty(i)) {
+        continue;
+      }
+      region = db[i];
+      bbox = region.bbox;
+      L.polygon([
+              [bbox[1], bbox[0]],
+              [bbox[3], bbox[0]],
+              [bbox[3], bbox[2]],
+              [bbox[1], bbox[2]],
+              [bbox[1], bbox[0]]
+      ], {'weight': 1}).addTo(map).bindPopup(
+              '<a href=' + i + '>' + region.title + '<\a>');
+    }
+  });
+
 </script>
 
 <!-- Piwik -->
