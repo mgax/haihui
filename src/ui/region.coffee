@@ -22,15 +22,15 @@ initialize = (db) ->
 
   locationbuttong = actionbarRight.append('g')
       .attr('class', 'locationbutton')
-      .attr('transform', "translate(50, #{app.ACTIONBAR_HEIGHT / 2})")
+      .attr('transform', "translate(60, #{app.ACTIONBAR_HEIGHT / 2})")
 
-  noteG = actionbarRight.append('g')
-      .attr('class', 'note')
-      .attr('transform', "translate(0, #{app.ACTIONBAR_HEIGHT / 2})")
+#  noteG = actionbarRight.append('g')
+#      .attr('class', 'note')
+#      .attr('transform', "translate(0, #{app.ACTIONBAR_HEIGHT / 2})")
 
 
   meteoG = actionbarRight.append('g')
-    .attr('transform', "translate(-75, 3)")
+    .attr('transform', "translate(-10, 3)")
     .attr('class', "meteobutton")
 
   meteoG.append('a')
@@ -83,10 +83,10 @@ initialize = (db) ->
     symbols: canvas.symbols
   )
 
-  app.note(
-    map: map
-    g: noteG
-  )
+#  app.note(
+#    map: map
+#    g: noteG
+#  )
 
   d3.select('.splash').remove()
   map.dispatch.ready()
