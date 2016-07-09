@@ -14,7 +14,7 @@ data = module.exports = {}
 
 
 data.REGION = {
-  bucegi:     {bbox: [25.36, 45.33, 25.58, 45.52], title: "Bucegi", meteoLink: "mun%C5%A3ii-bucegi_romania_683598"}
+  bucegi:     {bbox: [25.36, 45.33, 25.58, 45.53], title: "Bucegi", meteoLink: "mun%C5%A3ii-bucegi_romania_683598"}
   capatanii:  {bbox: [24.00, 45.17, 24.19, 45.34], title: "Căpățânii", meteoLink: "mun%C5%A3ii-c%C4%83p%C4%83%C5%A3%C3%A2nii_romania_682818"}
   ceahlau:    {bbox: [25.85, 46.84, 26.08, 47.04], title: "Ceahlău", meteoLink: "masivul-ceahl%C4%83u_romania_682481 "}
   ciucas:     {bbox: [25.84, 45.43, 26.05, 45.56], title: "Ciucaș", meteoLink: "ciucas_romania_7874266"}
