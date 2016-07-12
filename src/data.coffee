@@ -445,7 +445,7 @@ data.dem = (region) ->
             data/contours/#{region}-prj.shp
             data/contours/#{region}.shp")
     .then ->
-      exec("topojson
+      exec("./node_modules/.bin/topojson
             contour=data/contours/#{region}-prj.shp
             -o #{demPath}
             --id-property ID
