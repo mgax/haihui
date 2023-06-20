@@ -19,10 +19,11 @@ sudo apt-get install python-gdal gdal-bin
 npm install -g topojson
 ```
 
-Download file [GEO
-Archive](https://grep.ro/quickpub/srtm/srtm-1arcsec-ro.tiff.bz2), extract and
-copy to `data/` folder from project's home location. Create a folder named
-`contours/` under `data/`.
+### DEM
+* Create a directory named `./data/`.
+* Download tiles from https://earthexplorer.usgs.gov/, from the [SRTMGL1v003](https://lpdaac.usgs.gov/products/srtmgl1v003/) dataset. They come as `.hgt.zip` files. Unarchive the files and place the `.hgt` files under `./data/srtm-hgt/`.
+* Run `make` to convert the files to `tif` and create a mosaic file.
+* Create a folder named `./data/contours/`.
 
 Create map for specific region, eg. for Piatra Craiului (crai):
 
