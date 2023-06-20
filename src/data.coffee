@@ -121,7 +121,7 @@ albers = (bbox) ->
 
 
 albersProj = (param) ->
-  return "+proj=aea +x0=0 +y0=0 +units=m +no_defs
+  return "+proj=aea +x0=0 +y0=0 +units=m +ellps=WGS84 +no_defs
           +lat_1=#{param.lat_1} +lat_2=#{param.lat_2}
           +lat_0=#{param.lat_0} +lon_0=#{param.lon_0}"
 
@@ -373,9 +373,9 @@ compileOsm = (bbox, osm, dem) ->
     if o.type == 'way' and o.tags.natural == 'water'
       lakes.push(lake(o))
 
-    if o.type == 'way' or o.type == 'relation'
-      if landuseType(o)?
-        land.push(landFeature(o))
+    # if o.type == 'way' or o.type == 'relation'
+    #   if landuseType(o)?
+    #     land.push(landFeature(o))
 
   altitudeList(poi.map((p) -> projection.inverse(p.geometry.coordinates)))
 
@@ -414,7 +414,8 @@ altitudeList = (coordinateList) ->
 
   input = coordinateList.map((p) -> "#{p[0]} #{p[1]}\n").join('')
 
-  exec("gdallocationinfo -wgs84 -valonly data/srtm-1arcsec-ro.tiff", input)
+  exec("docker compose run --rm gdal
+        gdallocationinfo -wgs84 -valonly data/srtm-tif/mosaic.vrt", input)
 
   .then (out) ->
     return out.trim().split("\n").map((line) -> +line)
@@ -429,18 +430,21 @@ data.dem = (region) ->
     exec("rm -f data/contours/#{region}.*")
     exec("rm -f data/contours/#{region}-prj.*")
     .then ->
-      exec("gdalwarp
-            data/srtm-1arcsec-ro.tiff
+      exec("docker compose run --rm gdal
+            gdalwarp
+            data/srtm-tif/mosaic.vrt
             data/contours/#{region}.tiff
             -te #{bbox.join(' ')}")
     .then ->
-      exec("gdal_contour
+      exec("docker compose run --rm gdal
+            gdal_contour
             data/contours/#{region}.tiff
             data/contours/#{region}.shp
             -a elevation
             -i 100")
     .then ->
-      exec("ogr2ogr
+      exec("docker compose run --rm gdal
+            ogr2ogr
             -t_srs '#{albersProj(albers(bbox))}'
             data/contours/#{region}-prj.shp
             data/contours/#{region}.shp")

@@ -18,5 +18,8 @@
     "request": "^2.55.0",
     "topojson": "~1.6.18",
     "turf": "^2.0.2"
+  },
+  "overrides": {
+    "graceful-fs": "^4.2.11"
   }
 }
