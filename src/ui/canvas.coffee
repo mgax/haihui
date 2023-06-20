@@ -60,6 +60,7 @@ app.canvas = (options) ->
   canvas.locationg = mapLayer.append('g').attr('class', 'location')
 
   d3.select('body').call(zoom)
+  document.querySelector('svg.mapLayer').addEventListener('touchstart', (e) -> e.preventDefault())
 
   resize = ->
     if map.sc?

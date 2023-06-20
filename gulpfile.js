@@ -59,7 +59,7 @@ gulp.task('assets', function() {
   var request = require('request');
   var fs = require('fs');
   var cdnjs = 'http://cdnjs.cloudflare.com/ajax/libs/';
-  request(cdnjs + 'd3/3.5.3/d3.min.js', function(err, res, body) {
+  request(cdnjs + 'd3/3.5.17/d3.min.js', function(err, res, body) {
     fs.writeFileSync('build/d3.min.js', body);
     request(cdnjs + 'topojson/1.6.9/topojson.min.js', function(err, res, body) {
       fs.writeFileSync('build/topojson.min.js', body);
