@@ -21,7 +21,7 @@ npm install -g topojson
 
 ### DEM
 * Create a directory named `./data/`.
-* Download tiles from https://earthexplorer.usgs.gov/, from the [SRTMGL1v003](https://lpdaac.usgs.gov/products/srtmgl1v003/) dataset. They come as `.hgt.zip` files. Unarchive the files and place the `.hgt` files under `./data/srtm-hgt/`.
+* Download tiles from https://earthexplorer.usgs.gov/, from the [SRTMGL1v003](https://lpdaac.usgs.gov/products/srtmgl1v003/) dataset. They come as `.hgt.zip` files. Unarchive the files and place the `.hgt` files under `./data/srtm-hgt/`. (Alternatively, OpenTopography will generate a GeoTIFF based on your selection: https://portal.opentopography.org/raster?opentopoID=OTSRTM.082015.4326.1)
 * Run `make` to convert the files to `tif` and create a mosaic file.
 * Create a folder named `./data/contours/`.
 
